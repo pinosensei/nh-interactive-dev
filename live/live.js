@@ -678,6 +678,40 @@ function renderResults(racer) {
     if (mine.finishedAt != null) setT($("my-result-text"), "youCame", { place: ordinalEn(mine.place), n: mine.place, time: fmtTime(mine.finishedAt - raceStartMs()) });
     else setT($("my-result-text"), "dnf", { s: mine.solved });
   }
+    // Show multiplayer rewards for finished racers only
+  const rewardSummary = $("reward-summary");
+  const claimBtn = $("claim-rewards-btn");
+
+  rewardSummary.hidden = true;
+  claimBtn.hidden = true;
+
+  if (racer && mine && mine.finishedAt != null) {
+    const playerCount = Object.keys(raceData.roster || {}).length;
+    const xpReward = multiplayerXPReward(mine.solved);
+    const coinReward = multiplayerCoinReward(playerCount, mine.place);
+    const claimKey = `nhLive_claimed_${room.id}_${raceData.startAt}`;
+    const claimed = localStorage.getItem(claimKey) === "1";
+
+    rewardSummary.textContent =
+      `⭐ +${xpReward} XP  |  🪙 +${coinReward} Coins`;
+    rewardSummary.hidden = false;
+    claimBtn.hidden = false;
+
+    claimBtn.disabled = claimed;
+    claimBtn.textContent = claimed
+      ? "✅ REWARDS CLAIMED"
+      : "🎁 CLAIM REWARDS";
+
+    claimBtn.onclick = () => {
+      if (localStorage.getItem(claimKey) === "1") return;
+      claimMultiplayerRewards(mine);
+
+      if (localStorage.getItem(claimKey) === "1") {
+        claimBtn.disabled = true;
+        claimBtn.textContent = "✅ REWARDS CLAIMED";
+      }
+    };
+  }
   fillBoard($("rank-list"), rows);
   renderReview(racer);
 }
