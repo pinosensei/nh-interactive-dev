@@ -559,6 +559,40 @@ function ranking() {
   rows.forEach((r, i) => { r.place = i + 1; });
   return rows;
 }
+// ---- NH Interactive multiplayer rewards ----
+function multiplayerCoinReward(playerCount, place) {
+  if (playerCount < 2) return 0; // no coin farming in solo test races
+
+  if (playerCount === 2) {
+    return [60, 50][place - 1] || 0;
+  }
+
+  if (playerCount === 3) {
+    return [65, 55, 40][place - 1] || 0;
+  }
+
+  if (playerCount === 4) {
+    return [65, 55, 55, 40][place - 1] || 0;
+  }
+
+  if (playerCount === 5) {
+    return [60, 55, 50, 40, 40][place - 1] || 0;
+  }
+
+  if (playerCount === 6 || playerCount === 7) {
+    return [65, 60, 55, 50, 40, 40, 40][place - 1] || 0;
+  }
+
+  // 8+ players
+  if (place === 1) return 70;
+  if (place === 2 || place === 3) return 60;
+  if (place === 4 || place === 5) return 50;
+  return 40;
+}
+
+function multiplayerXPReward(solved) {
+  return Math.max(0, Number(solved) || 0) * 10;
+}
 const medal = n => (n === 1 ? "🥇" : n === 2 ? "🥈" : n === 3 ? "🥉" : n + ".");
 const fmtTime = ms => { const s = Math.max(0, ms) / 1000; return `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, "0")}`; };
 
@@ -646,6 +680,26 @@ function renderResults(racer) {
   }
   fillBoard($("rank-list"), rows);
   renderReview(racer);
+}
+// ---- Claim NH Interactive rewards ----
+function claimMultiplayerRewards(mine) {
+  if (!mine || mine.finishedAt == null) return;
+
+  const playerCount = Object.keys(raceData.roster || {}).length;
+  const xpReward = multiplayerXPReward(mine.solved);
+  const coinReward = multiplayerCoinReward(playerCount, mine.place);
+
+  // One unique claim per race
+  const claimKey = `nhLive_claimed_${room.id}_${raceData.startAt}`;
+
+  if (localStorage.getItem(claimKey)) return;
+
+  const currentXP = Number(localStorage.getItem("portalXP") || 0);
+  const currentCoins = Number(localStorage.getItem("adventureCoins") || 0);
+
+  localStorage.setItem("portalXP", currentXP + xpReward);
+  localStorage.setItem("adventureCoins", currentCoins + coinReward);
+  localStorage.setItem(claimKey, "1");
 }
 function renderReview(racer) {
   $("review").hidden = !(racer && raceWords);
