@@ -1,0 +1,142 @@
+/* Base look (folded in from the old standalone style.css; only the rules this page uses). */
+:root{--ink:#1f2a44;--sky:#3a86ff;--mint:#06d6a0;--sun:#ffd23f;--coral:#ff6b6b;--paper:#fff8e7}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:16px;color:var(--ink);
+  font-family:"Hiragino Maru Gothic ProN","Yu Gothic UI","Meiryo","Trebuchet MS","Segoe UI",sans-serif;
+  background:radial-gradient(circle at 15% 10%,var(--sun) 0 18%,transparent 19%),
+             radial-gradient(circle at 90% 85%,var(--coral) 0 22%,transparent 23%),var(--sky)}
+.app{width:100%;max-width:480px;background:var(--paper);border:4px solid var(--ink);border-radius:28px;
+  padding:clamp(18px,5vw,30px);box-shadow:0 10px 0 var(--ink);text-align:center}
+h1{font-size:clamp(1.8rem,8vw,2.4rem);line-height:1.15;margin:.2em 0 .3em}
+h2{font-size:1.5rem;margin:.2em 0 .6em}
+h3{margin:0 0 .4em}
+.sub{font-size:1.1rem;margin:0 0 1.2rem}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:4px solid var(--sun);outline-offset:2px}
+.big{display:block;width:100%;min-height:64px;margin:14px 0;border:4px solid var(--ink);border-radius:20px;
+  font-size:1.35rem;font-weight:800;color:#fff;box-shadow:0 6px 0 var(--ink);text-shadow:0 2px 0 rgba(0,0,0,.25)}
+.big:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 var(--ink)}
+.big:disabled{opacity:.5;cursor:not-allowed}
+.green{background:var(--mint)}.blue{background:var(--sky)}
+.back,.small{border:3px solid var(--ink);background:#fff;border-radius:14px;min-height:44px;padding:8px 16px;font-weight:700}
+.back{margin-top:6px}
+label{display:block;text-align:left;font-weight:700;margin:14px 0}
+input{display:block;width:100%;margin-top:6px;padding:14px;font:inherit;font-size:1.1rem;
+  border:3px solid var(--ink);border-radius:14px;background:#fff}
+.card{background:#fff;border:3px solid var(--ink);border-radius:20px;padding:14px;margin:14px 0}
+.made{background:var(--sun)}
+.label{font-weight:800;margin-bottom:8px}
+#players{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+#players li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;
+  background:var(--paper);border:3px solid var(--ink);border-radius:14px;font-weight:700;text-align:left;overflow-wrap:anywhere}
+#players li.host{background:var(--sun)}
+.tag{flex:none;font-size:.8rem;padding:4px 10px;border-radius:99px;border:2px solid var(--ink);background:#fff}
+.tag-host{background:var(--coral);color:#fff}
+.wait{margin:12px 0 0;font-style:italic}
+#toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:9;max-width:92vw;
+  background:var(--ink);color:#fff;padding:12px 18px;border-radius:14px;font-weight:700}
+
+/* Phase A additions. */
+.rooms{display:grid;gap:8px;margin:0 0 12px;max-height:46vh;overflow:auto}
+.room-row{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:8px;width:100%;
+  padding:10px 12px;background:#fff;border:3px solid var(--ink);border-radius:14px;text-align:left;font-weight:700}
+.room-row:hover:not(.off){background:var(--paper)}
+.room-row.off{opacity:.55;cursor:not-allowed}
+.room-row .rn{overflow-wrap:anywhere}
+.room-row .rn small{display:block;font-weight:600;opacity:.75}
+.room-row .rc{font-variant-numeric:tabular-nums}
+.badge{font-size:.78rem;padding:3px 9px;border-radius:99px;border:2px solid var(--ink);background:#fff;white-space:nowrap}
+.b-waiting{background:var(--mint)}.b-racing{background:var(--sun)}.b-full{background:var(--coral);color:#fff}.b-finished{background:#ddd}
+.note{font-size:.85rem;margin:8px 0 0;opacity:.8}
+#players li .tag-spec{background:#ddd}
+#players li.offline{opacity:.6}
+.small:disabled{opacity:.5;cursor:not-allowed}
+
+/* Phase B additions */
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin:0 0 10px}
+.units label{display:flex;align-items:center;gap:6px;background:#fff;border:2px solid var(--ink);border-radius:10px;padding:6px 8px;font-weight:700;margin:0}
+.units label.off{opacity:.5}
+.units small{display:block;font-weight:600;opacity:.75}
+.pool{font-weight:700;margin:10px 0}
+.pool.ok{color:#127a3a}.pool.bad{color:#b3261e}
+.countdown{font-size:2rem;font-weight:800;text-align:center;margin:8px 0}
+#race-players li.offline,#race-players li.gone{opacity:.6}
+.kick{margin-left:8px}
+select{max-width:100%}
+
+/* Phase C additions */
+.qword{font-size:2rem;font-weight:800;text-align:center;margin:10px 0;overflow-wrap:anywhere}
+.choices{display:grid;gap:8px;margin:8px 0}
+.choices button{padding:12px;font-size:1.1rem;font-weight:700;background:#fff;border:3px solid var(--ink);border-radius:14px;text-align:left}
+.choices button.good{background:var(--mint)}
+.choices button.bad{background:var(--coral);color:#fff;opacity:.8}
+.choices button:disabled{cursor:not-allowed}
+.board{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.board li{display:grid;grid-template-columns:2.2em 1fr auto;gap:6px;align-items:center;font-weight:700}
+.board li.me{background:var(--paper);border-radius:10px;padding:2px 4px}
+.board li.off{opacity:.6}
+.board .bar{grid-column:2/4;height:10px;border:2px solid var(--ink);border-radius:99px;background:#fff;overflow:hidden}
+.board .bar i{display:block;height:100%;background:var(--mint)}
+.board .gap{opacity:.6;justify-content:center}
+
+/* ===== Phase D ===== */
+/* Japanese line under an English line: put the Japanese in data-ja="..." */
+[data-ja]::after{content:attr(data-ja);display:block;font-size:.78em;font-weight:600;opacity:.85;line-height:1.3;white-space:normal}
+span[data-ja],.bi{display:inline-block}
+.bi::after{content:attr(data-ja);display:block;font-size:.78em;font-weight:600;opacity:.85;line-height:1.3}
+#toast::after{white-space:pre-line}
+.prefs{display:flex;gap:6px;justify-content:flex-end;margin:0 0 6px}
+.pref{min-height:36px}
+button{touch-action:manipulation}
+.choices button{min-height:56px;font-size:1.15rem}
+.choices button.good,.choices button.bad{animation:pop .25s}
+@keyframes pop{0%{transform:scale(.97)}60%{transform:scale(1.03)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.choices button.good,.choices button.bad{animation:none}}
+.big,.back{min-height:48px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal[hidden]{display:none}
+.modal-box{background:#fff;border:3px solid var(--ink);border-radius:18px;padding:18px;max-width:420px;width:100%}
+.coral{background:var(--coral);color:#fff}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;margin:10px 0 14px}
+.podium .slot{flex:1;max-width:140px;text-align:center;border:3px solid var(--ink);border-radius:14px 14px 0 0;padding:8px 4px;background:#fff;overflow-wrap:anywhere;font-weight:800}
+.podium .slot .medal{font-size:1.8rem;display:block}
+.podium .slot small{display:block;font-weight:600;opacity:.8}
+.podium .s1{min-height:120px;background:var(--sun)}
+.podium .s2{min-height:90px;background:#e6edf5}
+.podium .s3{min-height:72px;background:#f3dcc4}
+.myres{font-size:1.15rem;font-weight:800;margin:4px 0}
+.review{list-style:none;margin:6px 0 10px;padding:0;display:grid;gap:4px}
+.review li{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed #bbb;padding:3px 0}
+.review li b{white-space:nowrap}
+.board .rk{font-variant-numeric:tabular-nums}
+/* projector view: big text, everything but the board and results hidden */
+body.projector .prefs,body.projector #play,body.projector #my-done,body.projector #spectator-note,body.projector #race-verify,body.projector #btn-leave2,body.projector #btn-end,body.projector #btn-again,body.projector .kick{display:none !important}
+body.projector .app{max-width:none;width:100%;padding:10px 3vw}
+body.projector #race-title,body.projector h2{font-size:2.2rem}
+body.projector .countdown{font-size:4rem}
+body.projector .board{grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:10px 24px}
+body.projector .board li{font-size:1.6rem}
+body.projector .board .bar{height:18px}
+body.projector .podium .slot{font-size:1.6rem;max-width:260px}
+body.projector #btn-proj{font-size:1rem}
+@media (max-width:480px){.board li{grid-template-columns:2em 1fr auto;font-size:.95rem}.qword{font-size:1.7rem}.podium .slot{font-size:.9rem}}
+
+/* Phase E1: English -> Japanese (long English prompts, long Japanese answers) */
+.qword.long{font-size:1.5rem}
+.choices button{overflow-wrap:anywhere;line-height:1.35}
+@media (max-width:480px){.qword.long{font-size:1.3rem}}
+
+/* Phase E2: Spelling (typing) */
+.typebox{display:grid;gap:8px;margin:8px 0}
+.blanks{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.5rem;font-weight:800;text-align:center;letter-spacing:.08em;white-space:pre-wrap;overflow-wrap:anywhere;margin:4px 0}
+.typebox input{width:100%;box-sizing:border-box;font-size:1.4rem;font-weight:700;padding:12px;border:3px solid var(--ink);border-radius:14px;background:#fff;text-transform:none}
+.typebox input.bad{background:var(--coral);color:#fff;animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.typebox input.bad{animation:none}}
+body.projector #q-type{display:none !important}
+@media (max-width:480px){.blanks{font-size:1.25rem}}
+.choices[hidden],.typebox[hidden]{display:none}
+
+/* Stage 1 (integration): link back to the main NH Interactive page */
+.backlink{display:inline-block;text-decoration:none;color:var(--ink);margin-top:14px}
