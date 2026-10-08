@@ -35,6 +35,7 @@ const $ = id => document.getElementById(id);
 const MAX = 35;                         // racer seats per room
 const MIN_RACERS = 1;                   // TESTING value: START needs at least this many racers (a real classroom value is still to be decided)
 const COUNTDOWN_MS = 5000;
+const FINAL_COUNTDOWN_MS = 15000; // 15 seconds after the first racer finishes
 const GRADES = [["nh1", "New Horizon 1 (NH1)"], ["nh2", "New Horizon 2 (NH2)"], ["nh3", "New Horizon 3 (NH3)"]];
 const HIDE_AFTER = 2 * 60 * 1000;       // browser hides rooms silent for 2 minutes
 const ALPHA = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";   // no 0 O 1 I L
@@ -542,12 +543,39 @@ function routeScreens(iAmHost) {
 const raceStartMs = () => raceData.startAt + raceData.config.countdownMs;
 function tick() {
   if (!room || !raceData || !raceData.config) return;
+
   const left = raceStartMs() - serverNow();
-  if (entry && entry.status === "finished") setT($("race-count"), "raceOver"); else if (left > 0) setT($("race-count"), "startsIn", { n: Math.ceil(left / 1000) }); else setT($("race-count"), "go");
+  const finalLeft = finalCountdownLeft();
+
+  if (entry && entry.status === "finished") {
+    setT($("race-count"), "raceOver");
+  } else if (left > 0) {
+    setT($("race-count"), "startsIn", { n: Math.ceil(left / 1000) });
+  } else if (finalLeft !== null) {
+    const seconds = Math.ceil(finalLeft / 1000);
+    $("race-count").textContent = `🚨 HURRY UP! ${seconds}s`;
+    $("race-count").setAttribute("data-ja", "急いで！残り" + seconds + "秒");
+  } else {
+    setT($("race-count"), "go");
+  }
+
   if (left <= 0) startEngine();
 }
 
 /* ---- ranking (same on every device: finished by server time, then unfinished by solved count) ---- */
+// Final 15-second countdown after the first racer finishes
+function finalCountdownLeft() {
+  if (!raceData || !raceData.progress) return null;
+
+  const finishTimes = Object.values(raceData.progress)
+    .map(p => p.finishedAt)
+    .filter(t => typeof t === "number");
+
+  if (!finishTimes.length) return null;
+
+  const firstFinish = Math.min(...finishTimes);
+  return Math.max(0, firstFinish + FINAL_COUNTDOWN_MS - serverNow());
+}
 function ranking() {
   const rows = Object.entries(raceData.roster || {}).map(([id, r]) => {
     const p = progOf(id), n = solvedOf(id).length;
@@ -895,10 +923,39 @@ setInterval(() => {
 
 /* ---- the race ends by itself, and the room goes back to the lobby ---- */
 function maybeFinishRace(racer) {
-  if (!racer || entry.status !== "racing" || typeof progOf(uid).finishedAt !== "number") return;
-  for (const [, who] of Object.entries(seatsReal)) if (typeof progOf(who).finishedAt !== "number" && presence[who]) return;   // someone who is here is still racing
-  if (Date.now() - finishTry < 3000) return; finishTry = Date.now();
-  set(ref(db, `liveRoomList/${room.id}/status`), "finished").catch(() => {});   // the rules double-check this
+  if (!room || !raceData || !entry || entry.status !== "racing") return;
+
+  const finalLeft = finalCountdownLeft();
+
+  // First racer has finished: publish the verified finish time.
+  if (!raceData.firstFinished && finalLeft !== null) {
+    const first = ranking().find(p => p.finishedAt !== null);
+
+    if (first && Date.now() - finishTry >= 3000) {
+      finishTry = Date.now();
+
+      set(ref(db, `liveRooms/${room.id}/race/firstFinished`), {
+        uid: first.id,
+        at: first.finishedAt
+      }).catch(() => {});
+    }
+    return;
+  }
+
+  // End the race when all connected racers finish, or after 15 seconds.
+  const allDone = racer &&
+    typeof progOf(uid).finishedAt === "number" &&
+    Object.values(seatsReal).every(who =>
+      typeof progOf(who).finishedAt === "number" || !presence[who]
+    );
+
+  if (!allDone && !(raceData.firstFinished && finalLeft === 0)) return;
+
+  if (Date.now() - finishTry < 3000) return;
+  finishTry = Date.now();
+
+  set(ref(db, `liveRoomList/${room.id}/status`), "finished")
+    .catch(() => {});
 }
 function returnWrites(id) {   // race removed, room back to waiting, people who are not here are cleared (the old host too)
   let w = { [`liveRooms/${id}/race`]: null, [`liveRoomList/${id}/status`]: "waiting" };
