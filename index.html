@@ -1143,6 +1143,38 @@ overflow-y:auto;
     <div id="wrongGrid" class="flashcard-grid"></div>
   </section>
 </main>
+  <!-- TEACHER LOGIN WINDOW -->
+<div id="teacherLoginModal" class="hidden"
+     style="position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;padding:20px;">
+
+  <div style="background:white;color:#14314b;padding:30px;border-radius:22px;width:100%;max-width:400px;text-align:center;">
+
+    <div style="font-size:60px;">👨‍🏫</div>
+    <h2>Teacher Login</h2>
+    <p>先生専用ログイン</p>
+
+    <input id="teacherUsername" type="text"
+           placeholder="Teacher Username"
+           autocomplete="username"
+           style="width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:10px;">
+
+    <input id="teacherPassword" type="password"
+           placeholder="Password"
+           autocomplete="current-password"
+           style="width:100%;padding:12px;margin:8px 0;border:1px solid #ccc;border-radius:10px;">
+
+    <button id="teacherLoginSubmit" type="button"
+            style="width:100%;padding:13px;background:#458fe2;color:white;border:0;border-radius:10px;cursor:pointer;margin-top:10px;">
+      🔐 Login
+    </button>
+
+    <button id="teacherLoginClose" type="button"
+            style="margin-top:12px;border:0;background:transparent;cursor:pointer;">
+      Cancel
+    </button>
+
+  </div>
+</div>
   <!-- NH AVATAR SYSTEM -->
 <div id="nhAvatarSystem">
   <div id="nhAvatarModal" class="hidden">
@@ -2691,5 +2723,22 @@ $("nhShopClose").onclick=()=>{
   $("nhShopModal").classList.add("hidden");
 };
 </script>
+ <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const portalBtn = document.getElementById("teacherPortalBtn");
+  const loginModal = document.getElementById("teacherLoginModal");
+  const closeBtn = document.getElementById("teacherLoginClose");
+
+  if (!portalBtn || !loginModal || !closeBtn) return;
+
+  portalBtn.addEventListener("click", function () {
+    loginModal.classList.remove("hidden");
+  });
+
+  closeBtn.addEventListener("click", function () {
+    loginModal.classList.add("hidden");
+  });
+});
+</script> 
 </body>
 </html>
