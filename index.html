@@ -833,6 +833,36 @@ overflow-y:auto;
   .flashcard,.flash-inner{min-height:290px}
 }
 
+
+/* Teacher Dashboard Phase 4 — presentation only, no student data writes */
+#teacherDashboardModal .td-shell{max-width:1240px;margin:auto;background:#f4f8fe;color:#14314b;border-radius:24px;padding:26px;min-height:75vh}
+.td-header,.td-tools{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.td-header h2{font-size:2rem;margin:4px 0}.td-subtitle{color:#58728d;margin:4px 0 18px}
+.td-summary{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:13px;margin:18px 0}
+.td-stat{background:white;border:1px solid #dbe7f3;border-radius:17px;padding:17px;box-shadow:0 5px 16px #204a6b0b}
+.td-stat span{display:block;font-size:13px;color:#5b7690}.td-stat strong{font-size:27px;display:block;margin-top:4px}
+.td-tools{background:white;border:1px solid #dbe7f3;border-radius:15px;padding:12px;margin:14px 0}
+.td-tools input,.td-tools select{padding:11px;border:1px solid #cbdbea;border-radius:10px;background:white;color:#14314b;min-width:170px}
+.td-table-wrap{overflow:auto;background:white;border:1px solid #dbe7f3;border-radius:17px}
+.td-table{width:100%;border-collapse:collapse;text-align:left;min-width:780px}
+.td-table th{background:#e8f2ff;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#436581}
+.td-table th,.td-table td{padding:14px 12px;border-bottom:1px solid #edf2f8}
+.td-table td small{display:block;color:#678098;margin-top:4px}.td-tag{display:inline-block;padding:5px 9px;border-radius:30px;background:#fff0cc;color:#7c5400;font-size:12px;font-weight:750}
+.td-empty{text-align:center;padding:42px;color:#58728d}.td-note{font-size:13px;color:#607990;margin:16px 0}
+@media(max-width:650px){#teacherDashboardModal{padding:8px!important}#teacherDashboardModal .td-shell{padding:16px}.td-summary{grid-template-columns:1fr 1fr}.td-header h2{font-size:1.5rem}}
+</style>
+
+<style>
+/* Phase 6: teacher-authorized reward editor */
+.td-student-link{border:0;background:none;color:#1766b3;text-decoration:underline;font:inherit;font-weight:800;cursor:pointer;padding:0;text-align:left}
+#tdRewardPanel{margin:16px 0;padding:20px;background:#fff;border:2px solid #a9c9ee;border-radius:18px;color:#14314b}
+#tdRewardPanel.hidden{display:none!important}
+.td-reward-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:12px 0}
+.td-reward-grid label{font-weight:700;font-size:13px}
+.td-reward-grid input,.td-reward-grid select{width:100%;padding:12px;border:1px solid #b6cde4;border-radius:10px;margin-top:5px}
+.td-reward-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#tdRewardMessage{font-weight:700;min-height:22px}
+@media(max-width:650px){.td-reward-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -1173,6 +1203,30 @@ overflow-y:auto;
     </button>
 
   </div>
+</div>
+  <!-- Teacher dashboard: accessible only after Firebase authentication and authorization -->
+<div id="teacherDashboardModal" class="hidden" style="position:fixed;inset:0;z-index:20001;background:rgba(0,0,0,.75);overflow:auto;padding:24px;">
+  <section class="td-shell">
+    <div class="td-header"><div><p class="eyebrow">NH INTERACTIVE · TEACHER ONLY</p><h2>👨‍🏫 Teacher Dashboard</h2><p class="td-subtitle">Student accounts & learning progress / 生徒管理</p></div><button id="teacherDashboardClose" class="secondary-btn" type="button">Sign out / ログアウト</button></div>
+    <p id="teacherDashboardStatus" role="status">Checking teacher authorization…</p>
+    <div class="td-summary"><div class="td-stat"><span>👥 Registered students</span><strong id="tdTotal">0</strong></div><div class="td-stat"><span>📘 Grade 7</span><strong id="tdG7">0</strong></div><div class="td-stat"><span>📗 Grade 8</span><strong id="tdG8">0</strong></div><div class="td-stat"><span>📕 Grade 9</span><strong id="tdG9">0</strong></div></div>
+    <div class="td-tools"><input id="tdSearch" type="search" placeholder="🔎 Search student or school / 検索" aria-label="Search students"><select id="tdGradeFilter" aria-label="Filter by grade"><option value="all">All grades / 全学年</option><option value="7">Grade 7 / 中1</option><option value="8">Grade 8 / 中2</option><option value="9">Grade 9 / 中3</option></select><span id="tdShown">0 shown</span></div>
+    <section id="tdRewardPanel" class="hidden" aria-label="Teacher reward editor">
+      <h3 id="tdRewardStudent">Selected student</h3>
+      <p>Teacher-only rewards / 先生専用の報酬付与 — rewards add to existing progress.</p>
+      <div class="td-reward-grid">
+        <label>⭐ Add XP / 経験値<input id="tdRewardXP" type="number" min="0" max="100000" step="1" value="300"></label>
+        <label>🪙 Add coins / コイン<input id="tdRewardCoins" type="number" min="0" max="100000" step="1" value="0"></label>
+        <label>🏅 Add levels / レベル<input id="tdRewardLevels" type="number" min="0" max="1000" step="1" value="0"></label>
+      </div>
+      <p id="tdRewardCurrent" style="font-size:13px;color:#57738d"></p>
+      <div class="td-reward-actions"><button id="tdRewardGive" type="button" class="primary-btn">Confirm all rewards / まとめて付与</button><button id="tdRewardCancel" type="button" class="secondary-btn">Cancel</button></div>
+      <p id="tdRewardMessage" role="status"></p>
+      <small>Levels are granted as 250 XP each, matching this site's level formula. Confirmation required. Firebase authorizes teacher writes.</small>
+    </section>
+    <div id="teacherStudentList" class="td-table-wrap"><div class="td-empty">Sign in to load student records.</div></div>
+    <p class="td-note">⚠️ XP, coins, levels and streaks are student-reported, not teacher-verified. Teacher rewards require confirmation and are saved to teacher-controlled Firebase progress. Student-reported values remain unverified.</p>
+  </section>
 </div>
   <!-- NH AVATAR SYSTEM -->
 <div id="nhAvatarSystem">
@@ -2721,23 +2775,234 @@ $("nhInventoryClose").onclick=()=>{
 $("nhShopClose").onclick=()=>{
   $("nhShopModal").classList.add("hidden");
 };
+window.addEventListener('nh-teacher-reward-applied',e=>{
+ const d=e.detail||{};
+ if(Number.isFinite(d.xp)&&d.xp>xp)xp=d.xp;
+ if(Number.isFinite(d.coins)&&d.coins>adventureCoins)adventureCoins=d.coins;
+ updateStats();renderDashboard();
+ const coin=document.getElementById('avatarCoinValue');if(coin)coin.textContent=adventureCoins;
+ const worldCoin=document.getElementById('coinValue');if(worldCoin)worldCoin.textContent=adventureCoins;
+});
 </script>
- <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const portalBtn = document.getElementById("teacherPortalBtn");
-  const loginModal = document.getElementById("teacherLoginModal");
-  const closeBtn = document.getElementById("teacherLoginClose");
+<script type="module">
+import {initializeApp,getApps,getApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,signInAnonymously,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getDatabase,ref,get,set,onValue,runTransaction,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+const config={apiKey:"AIzaSyCQWPYbU7mMBmcoQMs3_Qn8ujpwOf1GxSw",authDomain:"nh-interactive.firebaseapp.com",databaseURL:"https://nh-interactive-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"nh-interactive",appId:"1:395085592450:web:f1ee20534c2e69c1d9819b"};
+const app=getApps().length?getApp():initializeApp(config),auth=getAuth(app),db=getDatabase(app),el=id=>document.getElementById(id);
+// Independent teacher session: never replace the student's anonymous Firebase identity.
+const teacherApp=getApps().find(a=>a.name==='nh-main-teacher-portal')||initializeApp(config,'nh-main-teacher-portal');
+const teacherAuth=getAuth(teacherApp);
+const teacherDb=getDatabase(teacherApp);
+const login=el('teacherLoginModal'),dashboard=el('teacherDashboardModal');
+const status=document.createElement('p');status.id='teacherLoginStatus';status.setAttribute('role','alert');el('teacherLoginSubmit').after(status);
+const syncStatus=document.createElement('p');syncStatus.id='nhStudentSyncStatus';syncStatus.style='font-size:12px;margin-top:8px;opacity:.85';
+const actions=document.querySelector('.dashboard-actions');if(actions)actions.append(syncStatus);
+const profileKey='nhStudentRegistrationPreviewV1';
+let studentUid=null,teacherUnsub=null,rewardUnsub=null,lastUploaded='',syncBusy=false,connectPromise=null;
+function profile(){try{return JSON.parse(localStorage.getItem(profileKey)||'null')}catch{return null}}
+function positiveInt(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0}
+function progress(){const xp=positiveInt(localStorage.getItem('portalXP'));return {xp,level:Math.floor(xp/250)+1,coins:positiveInt(localStorage.getItem('adventureCoins')),streak:positiveInt(localStorage.getItem('portalStreak'))}}
+async function connectStudent(){
+ if(connectPromise)return connectPromise;
+ connectPromise=connectStudentOnce();
+ try{return await connectPromise}finally{connectPromise=null}
+}
+async function connectStudentOnce(){
+ const p=profile();if(!p||!p.firstName||!p.lastName||!['7','8','9'].includes(p.grade)||!p.school)return;
+ try{
+  if(!auth.currentUser)await signInAnonymously(auth);
+  if(!auth.currentUser?.isAnonymous)return;
+  const uid=auth.currentUser.uid;studentUid=uid;
+  const path=ref(db,`studentAccounts/${uid}/profile`);
+  const existing=await get(path);
+  if(!existing.exists()){
+   await set(path,{firstName:p.firstName,lastName:p.lastName,grade:p.grade,school:p.school,createdAt:serverTimestamp()});
+  }else{
+   const stored=existing.val();
+   if(['firstName','lastName','grade','school'].some(k=>stored[k]!==p[k])){
+    syncStatus.textContent='Registered profile differs from Firebase. Contact a teacher to update it; local progress is safe.';
+   }
+  }
+  if(rewardUnsub)rewardUnsub();
+  rewardUnsub=onValue(ref(db,`studentAccounts/${uid}/progress`),snap=>{
+    const awarded=snap.val();if(!awarded)return;
+    const current=progress();
+    const nextXP=Math.max(current.xp,positiveInt(awarded.xp));
+    const nextCoins=Math.max(current.coins,positiveInt(awarded.coins));
+    if(nextXP>current.xp||nextCoins>current.coins){
+      if(nextXP>current.xp)localStorage.setItem('portalXP',String(nextXP));
+      if(nextCoins>current.coins)localStorage.setItem('adventureCoins',String(nextCoins));
+      window.dispatchEvent(new CustomEvent('nh-teacher-reward-applied',{detail:{xp:nextXP,coins:nextCoins}}));
+      lastUploaded='';syncStatus.textContent='Teacher reward received! / 先生から報酬が届きました';
+      syncProgress();
+    }
+  },e=>{syncStatus.textContent='Reward updates pending: '+e.message});
+  await syncProgress();
+ }catch(e){syncStatus.textContent='Firebase sync pending: '+(e?.message||'connection unavailable')}
+}
+async function syncProgress(){
+ if(syncBusy||!studentUid||!auth.currentUser?.isAnonymous||auth.currentUser.uid!==studentUid)return;
+ const data=progress(),serialized=JSON.stringify(data);if(serialized===lastUploaded)return;
+ syncBusy=true;
+ try{await set(ref(db,`studentAccounts/${studentUid}/reported`),{...data,updatedAt:serverTimestamp()});lastUploaded=serialized;syncStatus.textContent='Student progress synced (reported, not teacher-verified).';}
+ catch(e){syncStatus.textContent='Progress remains saved on this browser; cloud sync pending: '+(e?.message||'error')}
+ finally{syncBusy=false}
+}
+window.addEventListener('nh-student-profile-saved',()=>{lastUploaded='';if(auth.currentUser?.isAnonymous)connectStudent()});
+onAuthStateChanged(auth,user=>{if(user?.isAnonymous)connectStudent();else {studentUid=null;lastUploaded='';if(rewardUnsub){rewardUnsub();rewardUnsub=null}}});
+setInterval(()=>{if(profile()&&auth.currentUser?.isAnonymous){if(!studentUid)connectStudent();else syncProgress()}},15000);
+if(profile())connectStudent();
+el('teacherPortalBtn').addEventListener('click',()=>{status.textContent='';login.classList.remove('hidden')});
+el('teacherLoginClose').addEventListener('click',()=>login.classList.add('hidden'));
+el('teacherDashboardClose').addEventListener('click',async()=>{if(teacherUnsub){teacherUnsub();teacherUnsub=null}selectedRewardUid=null;el('tdRewardPanel').classList.add('hidden');dashboard.classList.add('hidden');el('teacherStudentList').replaceChildren();await signOut(teacherAuth);if(profile()&&auth.currentUser?.isAnonymous)connectStudent()});
+let tdRecords=[],selectedRewardUid=null;
+const rewardPanel=el('tdRewardPanel');
+function selectRewardStudent(uid){
+ const found=tdRecords.find(([id])=>id===uid);if(!found)return;
+ selectedRewardUid=uid;const p=found[1].profile||{},r=found[1].reported||{};
+ el('tdRewardStudent').textContent='🎓 '+[p.firstName,p.lastName].filter(Boolean).join(' ')+' — Grade '+p.grade;
+ el('tdRewardCurrent').textContent='Reported: '+String(r.xp??0)+' XP · '+String(r.coins??0)+' coins · Level '+String(r.level??1);
+ el('tdRewardMessage').textContent='';
+ rewardPanel.classList.remove('hidden');rewardPanel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+el('tdRewardCancel').addEventListener('click',()=>{selectedRewardUid=null;rewardPanel.classList.add('hidden')});
+el('tdRewardGive').addEventListener('click',async()=>{
+ const uid=selectedRewardUid;
+ const xpAdd=Number(el('tdRewardXP').value);
+ const coinsAdd=Number(el('tdRewardCoins').value);
+ const levelsAdd=Number(el('tdRewardLevels').value);
+ if(!uid||![[xpAdd,100000],[coinsAdd,100000],[levelsAdd,1000]].every(([v,max])=>Number.isSafeInteger(v)&&v>=0&&v<=max)||(xpAdd+coinsAdd+levelsAdd===0)){
+   el('tdRewardMessage').textContent='Enter nonnegative whole numbers (at least one reward must be greater than zero).';return;
+ }
+ const found=tdRecords.find(([id])=>id===uid);if(!found)return;
+ const p=found[1].profile||{},name=[p.firstName,p.lastName].filter(Boolean).join(' ');
+ const summary=['+'+xpAdd+' XP','+'+coinsAdd+' coins','+'+levelsAdd+' levels'].join(', ');
+ if(!window.confirm('Give '+summary+' to '+name+'?\\nThis updates their Firebase progress.'))return;
+ const btn=el('tdRewardGive');btn.disabled=true;el('tdRewardMessage').textContent='Saving securely…';
+ try{
+  const user=teacherAuth.currentUser;if(!user)throw Error('Teacher session expired. Sign in again.');
+  const allowed=await get(ref(teacherDb,'teacherAdmins/'+user.uid));
+  if(allowed.val()!==true)throw Error('Teacher authorization failed.');
+  const reported=found[1].reported||{};
+  const deltaXP=xpAdd+levelsAdd*250;
+  const target=ref(teacherDb,'studentAccounts/'+uid+'/progress');
+  const result=await runTransaction(target,previous=>{
+    const old=previous||{};
+    const baseXP=Math.max(positiveInt(old.xp),positiveInt(reported.xp));
+    const baseCoins=Math.max(positiveInt(old.coins),positiveInt(reported.coins));
+    const nextXP=baseXP+deltaXP,nextCoins=baseCoins+coinsAdd;
+    if(!Number.isSafeInteger(nextXP)||!Number.isSafeInteger(nextCoins))return;
+    return {xp:nextXP,level:Math.floor(nextXP/250)+1,coins:nextCoins,
+      streak:Math.max(positiveInt(old.streak),positiveInt(reported.streak)),
+      updatedAt:serverTimestamp()};
+  },{applyLocally:false});
+  if(!result.committed)throw Error('Transaction was not committed.');
+  el('tdRewardMessage').textContent='✅ Saved! '+summary+' for '+name+'.';
+ }catch(e){el('tdRewardMessage').textContent='❌ Reward not saved: '+(e.message||e)}
+ finally{btn.disabled=false}
+});
 
-  if (!portalBtn || !loginModal || !closeBtn) return;
-
-  portalBtn.addEventListener("click", function () {
-    loginModal.classList.remove("hidden");
-  });
-
-  closeBtn.addEventListener("click", function () {
-    loginModal.classList.add("hidden");
-  });
+function renderStudents(records){
+ tdRecords=Object.entries(records||{}).filter(([,r])=>r&&r.profile).sort((a,b)=>String(a[1].profile.grade).localeCompare(String(b[1].profile.grade))||String(a[1].profile.lastName||'').localeCompare(String(b[1].profile.lastName||'')));
+ el('tdTotal').textContent=tdRecords.length;
+ for(const grade of ['7','8','9'])el('tdG'+grade).textContent=tdRecords.filter(([,r])=>String(r.profile.grade)===grade).length;
+ el('teacherDashboardStatus').textContent=tdRecords.length+' registered student(s) loaded. Student-reported progress is unverified.';
+ drawTeacherRows();
+}
+function drawTeacherRows(){
+ const host=el('teacherStudentList'),query=el('tdSearch').value.trim().toLowerCase(),grade=el('tdGradeFilter').value;
+ const rows=tdRecords.filter(([,r])=>{const p=r.profile||{};return(grade==='all'||String(p.grade)===grade)&&[p.firstName,p.lastName,p.school,p.grade].join(' ').toLowerCase().includes(query)});
+ el('tdShown').textContent=rows.length+' shown';host.replaceChildren();
+ if(!rows.length){const empty=document.createElement('div');empty.className='td-empty';empty.textContent=tdRecords.length?'No matching students.':'No registered students yet. Once student registration and Firebase sync are enabled, they will appear here.';host.append(empty);return}
+ const table=document.createElement('table');table.className='td-table';
+ const thead=document.createElement('thead'),header=document.createElement('tr');
+ ['Student / 生徒','Grade','School / 学校','Level','XP','Coins','Streak','Status'].forEach(label=>{const th=document.createElement('th');th.textContent=label;header.append(th)});thead.append(header);table.append(thead);
+ const tbody=document.createElement('tbody');
+ for(const [uid,record] of rows){const p=record.profile||{},r=record.reported||{},tr=document.createElement('tr');
+ const cells=[[p.firstName,p.lastName].filter(Boolean).join(' ')||'—',p.grade||'—',p.school||'—',r.level??'—',r.xp??'—',r.coins??'—',r.streak??'—'];
+ cells.forEach((value,i)=>{const td=document.createElement('td');if(i===0){const link=document.createElement('button');link.type='button';link.className='td-student-link';link.textContent=String(value);link.addEventListener('click',()=>selectRewardStudent(uid));td.append(link)}else{td.textContent=String(value)}if(i===0){const small=document.createElement('small');small.textContent='ID: '+uid.slice(0,8)+'…';td.append(small)}tr.append(td)});
+ const td=document.createElement('td'),tag=document.createElement('span');tag.className='td-tag';tag.textContent=record.progress?'Recovery assigned':'Reported only';td.append(tag);tr.append(td);tbody.append(tr)
+ }
+ table.append(tbody);host.append(table)
+}
+el('tdSearch').addEventListener('input',drawTeacherRows);
+el('tdGradeFilter').addEventListener('change',drawTeacherRows);
+el('teacherLoginSubmit').addEventListener('click',async()=>{
+ const btn=el('teacherLoginSubmit');btn.disabled=true;status.textContent='Signing in…';
+ try{const email=el('teacherUsername').value.trim(),password=el('teacherPassword').value;if(!email||!password)throw Error('Enter teacher email and password.');
+ const result=await signInWithEmailAndPassword(teacherAuth,email,password);const allowed=await get(ref(teacherDb,`teacherAdmins/${result.user.uid}`));if(allowed.val()!==true){await signOut(teacherAuth);throw Error('Not authorized as teacher.');}
+ login.classList.add('hidden');dashboard.classList.remove('hidden');el('teacherPassword').value='';
+ if(teacherUnsub)teacherUnsub();teacherUnsub=onValue(ref(teacherDb,'studentAccounts'),snap=>renderStudents(snap.val()),err=>el('teacherDashboardStatus').textContent='Database access error: '+err.message);
+ }catch(e){status.textContent=e.message||'Login failed.'}finally{btn.disabled=false}
 });
 </script> 
+
+<!-- Phase 3 registration preview: local registration with optional Firebase sync under draft rules -->
+<div id="studentRegistrationModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="studentRegTitle"
+ style="position:fixed;inset:0;z-index:19000;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px">
+ <form id="studentRegistrationForm" style="background:white;color:#14314b;width:min(460px,100%);border-radius:22px;padding:28px;box-shadow:0 20px 60px #0004">
+  <h2 id="studentRegTitle">🎓 Student Registration</h2><p>生徒登録 — This preview saves locally and attempts Firebase synchronization when permitted.</p>
+  <p style="font-size:14px;color:#46627b;margin:0 0 15px">Please enter your first name and family name separately.<br>名前（名）と名字（姓）を別々に入力してください。</p>
+  <label for="studentFirstName">First name / 名前（名）</label>
+  <input id="studentFirstName" required maxlength="40" autocomplete="given-name" placeholder="Example / 例: Rei" style="display:block;width:100%;padding:12px;margin:7px 0 16px;border:1px solid #aaa;border-radius:10px">
+  <label for="studentLastName">Last name (Family name) / 名字（姓）</label>
+  <input id="studentLastName" required maxlength="40" autocomplete="family-name" placeholder="Example / 例: Takaku" style="display:block;width:100%;padding:12px;margin:7px 0 16px;border:1px solid #aaa;border-radius:10px">
+  <label for="studentGrade">Grade / 学年</label>
+  <select id="studentGrade" required style="display:block;width:100%;padding:12px;margin:7px 0 16px;border:1px solid #aaa;border-radius:10px">
+   <option value="">Choose grade</option><option value="7">Grade 7</option><option value="8">Grade 8</option><option value="9">Grade 9</option>
+  </select>
+  <label for="studentSchool">School / 学校名</label>
+  <input id="studentSchool" required maxlength="120" style="display:block;width:100%;padding:12px;margin:7px 0 16px;border:1px solid #aaa;border-radius:10px">
+  <button type="submit" class="primary-btn" style="width:100%">Save Registration</button>
+  <button id="studentRegistrationCancel" type="button" class="secondary-btn" style="width:100%;margin-top:10px">Not now</button>
+ </form>
+</div>
+<script>
+(function(){
+  "use strict";
+  const key="nhStudentRegistrationPreviewV1";
+  const modal=document.getElementById("studentRegistrationModal");
+  const greeting=document.getElementById("dashboardGreeting");
+  function load(){try{return JSON.parse(localStorage.getItem(key)||"null")}catch{return null}}
+  function updateGreeting(){
+    const hour=new Date().getHours();
+    const part=hour<12?"Good morning":hour<18?"Good afternoon":"Good evening";
+    const profile=load();
+    const first=profile ? (profile.firstName || (profile.fullName||"").trim().split(/\s+/)[0]) : "";
+    greeting.textContent=part+(first?", "+first:"")+"!";
+  }
+  const observer=new MutationObserver(()=>{const profile=load();if(profile){const hour=new Date().getHours();const part=hour<12?"Good morning":hour<18?"Good afternoon":"Good evening";const expected=part+", "+(profile.firstName || (profile.fullName||"").trim().split(/\s+/)[0])+"!";if(greeting.textContent!==expected)greeting.textContent=expected;}});
+  observer.observe(greeting,{childList:true,characterData:true,subtree:true});
+  const existing=load();
+  if(existing){
+    document.getElementById("studentFirstName").value=existing.firstName || (existing.fullName||"").trim().split(/\s+/)[0] || "";
+    document.getElementById("studentLastName").value=existing.lastName || (existing.fullName||"").trim().split(/\s+/).slice(1).join(" ") || "";
+    document.getElementById("studentGrade").value=existing.grade||"";
+    document.getElementById("studentSchool").value=existing.school||"";
+  }else{
+    modal.classList.remove("hidden");
+  }
+  document.getElementById("studentRegistrationCancel").addEventListener("click",()=>modal.classList.add("hidden"));
+  document.getElementById("studentRegistrationForm").addEventListener("submit",e=>{
+    e.preventDefault();
+    const firstName=document.getElementById("studentFirstName").value.trim().replace(/\s+/g," ");
+    const lastName=document.getElementById("studentLastName").value.trim().replace(/\s+/g," ");
+    const fullName=firstName+" "+lastName;
+    const grade=document.getElementById("studentGrade").value;
+    const school=document.getElementById("studentSchool").value.trim();
+    if(!firstName||!lastName||!["7","8","9"].includes(grade)||!school)return;
+    localStorage.setItem(key,JSON.stringify({firstName,lastName,fullName,grade,school}));
+    window.dispatchEvent(new Event("nh-student-profile-saved"));
+    modal.classList.add("hidden");updateGreeting();
+  });
+  updateGreeting();
+  const btn=document.createElement("button");
+  btn.type="button";btn.className="secondary-btn";btn.textContent="✏️ Edit Student Profile";
+  btn.style.marginTop="10px";
+  btn.addEventListener("click",()=>modal.classList.remove("hidden"));
+  document.querySelector(".dashboard-actions").appendChild(btn);
+})();
+</script>
 </body>
 </html>
