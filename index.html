@@ -850,6 +850,9 @@ overflow-y:auto;
 .td-table td small{display:block;color:#678098;margin-top:4px}.td-tag{display:inline-block;padding:5px 9px;border-radius:30px;background:#fff0cc;color:#7c5400;font-size:12px;font-weight:750}
 .td-empty{text-align:center;padding:42px;color:#58728d}.td-note{font-size:13px;color:#607990;margin:16px 0}
 @media(max-width:650px){#teacherDashboardModal{padding:8px!important}#teacherDashboardModal .td-shell{padding:16px}.td-summary{grid-template-columns:1fr 1fr}.td-header h2{font-size:1.5rem}}
+/* Original emoji icons replace publisher book-cover artwork. */
+.nh-original-book-icon{display:grid;place-items:center;width:108px;height:145px;flex:0 0 auto;font-size:5rem;line-height:1;}
+@media(max-width:680px){.nh-original-book-icon{width:142px;height:190px;font-size:6rem;}}
 </style>
 
 <style>
@@ -966,15 +969,15 @@ overflow-y:auto;
 
   <div class="grade-grid">
     <button class="grade-card grade-blue" data-grade="nh1">
-      <img class="book-cover" src="new-horizon-1.png" alt="New Horizon 1 book cover">
+      <span class="nh-original-book-icon" role="img" aria-label="Grade 7 textbook icon">📘</span>
       <div class="grade-card-copy"><small>Grade 7</small><h2>New Horizon 1</h2><p>Junior High School Year 1</p></div><b>→</b>
     </button>
     <button class="grade-card grade-green" data-grade="nh2">
-      <img class="book-cover" src="new-horizon-2.png" alt="New Horizon 2 book cover">
+      <span class="nh-original-book-icon" role="img" aria-label="Grade 8 textbook icon">📗</span>
       <div class="grade-card-copy"><small>Grade 8</small><h2>New Horizon 2</h2><p>Junior High School Year 2</p></div><b>→</b>
     </button>
     <button class="grade-card grade-red" data-grade="nh3">
-      <img class="book-cover" src="new-horizon-3.png" alt="New Horizon 3 book cover">
+      <span class="nh-original-book-icon" role="img" aria-label="Grade 9 textbook icon">📕</span>
       <div class="grade-card-copy"><small>Grade 9</small><h2>New Horizon 3</h2><p>Junior High School Year 3</p></div><b>→</b>
     </button>
   </div>
