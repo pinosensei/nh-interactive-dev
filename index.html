@@ -1959,7 +1959,11 @@ function renderHomeAvatar(){
   const img = $("nhHomeAvatarImage");
   if(!img) return;
 
-  img.src = nhEquippedCharacter + ".png";
+ const selectedCharacter = NH_CHARACTERS.find(
+  character => character.id === nhEquippedCharacter
+);
+
+img.src = selectedCharacter?.file || nhEquippedCharacter + ".png";
   img.alt =
     nhEquippedCharacter === "boy free character" ? "Free Boy" :
     nhEquippedCharacter === "girl free character" ? "Free Girl" :
@@ -1998,7 +2002,8 @@ const NH_CHARACTERS = [
  { id:"girl10", name:"Girl 10", price:1300 },
 { id:"girl11", name:"Girl 11", price:1500 },
 { id:"girl12", name:"Girl 12", price:1500 },
-{ id:"girl13", name:"Girl 13", price:1500 }
+{ id:"girl13", name:"Girl 13", price:1500 },
+{ id:"banana_mascot_sway_10s_compressed", name:"🍌 Banana Mascot", price:2000, file:"banana_mascot_sway_10s_compressed.gif" }
 ];
 
 function renderCharacterGrid(){
@@ -2019,7 +2024,7 @@ function renderCharacterGrid(){
     card.className = "nh-character-card";
 
     card.innerHTML = `
-      <img src="${character.id}.png" alt="${character.name}">
+     <img src="${character.file || character.id + '.png'}" alt="${character.name}">
       <strong>${character.name}</strong>
       <span class="nh-character-status">
         ${equipped ? "✓ Equipped" :
@@ -2663,7 +2668,7 @@ function renderInventory(){
       card.className = "nh-inventory-card";
 
       card.innerHTML = `
-        <img src="${character.id}.png" alt="${character.name}">
+     <img src="${character.file || character.id + '.png'}" alt="${character.name}">
         <strong>${character.name}</strong>
         <span class="nh-character-status">
           ${equipped ? "✓ Equipped" : "✓ Owned"}
@@ -2709,7 +2714,7 @@ card.onclick = ()=>{
     card.className = "nh-shop-card";
 
     card.innerHTML = `
-      <img src="${character.id}.png" alt="${character.name}">
+    <img src="${character.file || character.id + '.png'}" alt="${character.name}">
       <strong>${character.name}</strong>
       <span class="nh-character-status">
         ${equipped ? "✓ Equipped" :
