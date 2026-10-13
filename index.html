@@ -867,6 +867,27 @@ overflow-y:auto;
 #tdRewardMessage{font-weight:700;min-height:22px}
 @media(max-width:650px){.td-reward-grid{grid-template-columns:1fr}}
 
+
+/* Speaking challenge: keep the picture, question and microphone in one screen. */
+#speakingView:has(#speakingGame:not(.hidden)) > .page-heading{display:none!important}
+#speakingView:has(#speakingGame:not(.hidden)) > #speakingHomeBack{margin:4px 0 10px;padding:8px 14px;font-size:0.9rem}
+#speakingView:has(#speakingGame:not(.hidden)) #speakingGame{max-width:900px;padding:14px 22px 16px;border-radius:18px}
+#speakingGame .game-top{font-size:.9rem;gap:12px}
+#speakingGame #speakingQuestion{font-size:clamp(1.3rem,2.4vw,1.85rem);line-height:1.2;margin:8px 0!important}
+#speakingGame #speakingPicture{max-width:450px!important;max-height:min(33vh,260px);margin:7px auto!important;border-width:2px!important}
+#speakingGame #speakingPicture img{width:100%;max-height:min(32vh,254px);object-fit:contain;display:block}
+#speakingGame #speakingJapanese{margin:4px 0!important;font-size:.9rem}
+#speakingGame #speakingListen{padding:8px 13px;font-size:.9rem}
+#speakingGame #speakingMic{font-size:1.05rem!important;padding:11px 20px!important}
+#speakingGame #speakingMic + *{margin:0}
+#speakingGame > div:has(> #speakingMic){margin:9px 0!important}
+#speakingGame #speakingStatus,#speakingGame p:has(#speakingHeard){margin:5px 0!important;font-size:.91rem}
+#speakingGame .feedback{margin:5px 0!important}
+#speakingGame #speakingCorrection{padding:9px!important;margin:7px auto!important}
+#speakingGame #speakingRetry,#speakingGame #speakingNext,#speakingGame #speakingExit{padding:8px 13px;font-size:.9rem}
+@media(max-height:760px){#speakingGame #speakingPicture{max-height:210px}#speakingGame #speakingPicture img{max-height:205px}}
+@media(max-width:600px){#speakingView:has(#speakingGame:not(.hidden)) #speakingGame{padding:10px 12px}#speakingGame #speakingPicture{max-height:30vh}#speakingGame #speakingPicture img{max-height:29vh}}
+
 /* Speaking Quiz: isolated styles */
 .speaking-modes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
 .speaking-modes button{min-height:85px;font-size:1.1rem}
@@ -3183,7 +3204,7 @@ el('teacherLoginSubmit').addEventListener('click',async()=>{
     const current=session;
     say(el('speakingQuestion').textContent,()=>{if(current===session&&el('speakingAuto').checked&&!awarded)listen()});
   }
-  function start(){if(!mode)return;session++;topic=el('speakingTopic').value;turn=0;score=0;lives=7;roundOver=false;roundPaid=false;lastAnswer='';roundQuestions=shuffle(picturePool).slice(0,20);pictureSequence=roundQuestions.map(q=>q.place);el('speakingSetup').classList.add('hidden');el('speakingGame').classList.remove('hidden');render()}
+  function start(){if(!mode)return;session++;topic=el('speakingTopic').value;turn=0;score=0;lives=7;roundOver=false;roundPaid=false;lastAnswer='';roundQuestions=shuffle(picturePool).slice(0,20);pictureSequence=roundQuestions.map(q=>q.place);el('speakingSetup').classList.add('hidden');el('speakingGame').classList.remove('hidden');window.scrollTo({top:0,behavior:'instant'});render()}
   function finishPictureRound(won){
     if(roundOver)return;
     roundOver=true;awarded=true;stop();session++;
