@@ -2935,15 +2935,50 @@ async function connectStudentOnce(){
   rewardUnsub=onValue(ref(db,`studentAccounts/${uid}/progress`),snap=>{
     const awarded=snap.val();if(!awarded)return;
     const current=progress();
-    const nextXP=Math.max(current.xp,positiveInt(awarded.xp));
-    const nextCoins=Math.max(current.coins,positiveInt(awarded.coins));
-    if(nextXP>current.xp||nextCoins>current.coins){
-      if(nextXP>current.xp)localStorage.setItem('portalXP',String(nextXP));
-      if(nextCoins>current.coins)localStorage.setItem('adventureCoins',String(nextCoins));
-      window.dispatchEvent(new CustomEvent('nh-teacher-reward-applied',{detail:{xp:nextXP,coins:nextCoins}}));
-      lastUploaded='';syncStatus.textContent='Teacher reward received! / 先生から報酬が届きました';
-      syncProgress();
-    }
+   
+  const nextXP = Math.max(current.xp, positiveInt(awarded.xp));
+
+const coinRewardKey = 'nhAppliedTeacherCoins_' + uid;
+const awardedCoins = positiveInt(awarded.coins);
+const previousAward = localStorage.getItem(coinRewardKey);
+
+let nextCoins = current.coins;
+
+if (previousAward === null) {
+  // First sync: preserve existing teacher-awarded coins.
+  nextCoins = Math.max(current.coins, awardedCoins);
+} else {
+  // Later rewards: apply only newly awarded coins.
+  const difference = Math.max(
+    0,
+    awardedCoins - positiveInt(previousAward)
+  );
+  nextCoins = current.coins + difference;
+}
+
+localStorage.setItem(coinRewardKey, String(awardedCoins));
+
+if (nextXP > current.xp || nextCoins > current.coins) {
+  if (nextXP > current.xp) {
+    localStorage.setItem('portalXP', String(nextXP));
+  }
+
+  if (nextCoins > current.coins) {
+    localStorage.setItem('adventureCoins', String(nextCoins));
+  }
+
+  window.dispatchEvent(new CustomEvent(
+    'nh-teacher-reward-applied',
+    {detail:{xp:nextXP, coins:nextCoins}}
+  ));
+
+  lastUploaded = '';
+  syncStatus.textContent =
+    'Teacher reward received! / 先生から報酬が届きました';
+
+  syncProgress();
+}
+   
   },e=>{syncStatus.textContent='Reward updates pending: '+e.message});
   await syncProgress();
  }catch(e){syncStatus.textContent='Firebase sync pending: '+(e?.message||'connection unavailable')}
