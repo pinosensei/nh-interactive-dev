@@ -2894,7 +2894,7 @@ window.addEventListener('nh-teacher-reward-applied',e=>{
 <script type="module">
 import {initializeApp,getApps,getApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,signInAnonymously,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getDatabase,ref,get,set,onValue,runTransaction,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+import {getDatabase,ref,get,set,remove,onValue,runTransaction,serverTimestamp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
 const config={apiKey:"AIzaSyCQWPYbU7mMBmcoQMs3_Qn8ujpwOf1GxSw",authDomain:"nh-interactive.firebaseapp.com",databaseURL:"https://nh-interactive-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"nh-interactive",appId:"1:395085592450:web:f1ee20534c2e69c1d9819b"};
 const app=getApps().length?getApp():initializeApp(config),auth=getAuth(app),db=getDatabase(app),el=id=>document.getElementById(id);
 // Independent teacher session: never replace the student's anonymous Firebase identity.
@@ -3059,12 +3059,63 @@ function drawTeacherRows(){
  if(!rows.length){const empty=document.createElement('div');empty.className='td-empty';empty.textContent=tdRecords.length?'No matching students.':'No registered students yet. Once student registration and Firebase sync are enabled, they will appear here.';host.append(empty);return}
  const table=document.createElement('table');table.className='td-table';
  const thead=document.createElement('thead'),header=document.createElement('tr');
- ['Student / 生徒','Grade','School / 学校','Level','XP','Coins','Streak','Status'].forEach(label=>{const th=document.createElement('th');th.textContent=label;header.append(th)});thead.append(header);table.append(thead);
+ ['Student / 生徒','Grade','School / 学校','Level','XP','Coins','Streak','Status','Action'].forEach(label=>{const th=document.createElement('th');th.textContent=label;header.append(th)});thead.append(header);table.append(thead);
  const tbody=document.createElement('tbody');
  for(const [uid,record] of rows){const p=record.profile||{},r=record.reported||{},tr=document.createElement('tr');
  const cells=[[p.firstName,p.lastName].filter(Boolean).join(' ')||'—',p.grade||'—',p.school||'—',r.level??'—',r.xp??'—',r.coins??'—',r.streak??'—'];
  cells.forEach((value,i)=>{const td=document.createElement('td');if(i===0){const link=document.createElement('button');link.type='button';link.className='td-student-link';link.textContent=String(value);link.addEventListener('click',()=>selectRewardStudent(uid));td.append(link)}else{td.textContent=String(value)}if(i===0){const small=document.createElement('small');small.textContent='ID: '+uid.slice(0,8)+'…';td.append(small)}tr.append(td)});
- const td=document.createElement('td'),tag=document.createElement('span');tag.className='td-tag';tag.textContent=record.progress?'Recovery assigned':'Reported only';td.append(tag);tr.append(td);tbody.append(tr)
+ const td=document.createElement('td'),tag=document.createElement('span');tag.className='td-tag';tag.textContent=record.progress?'Recovery assigned':'Reported only';td.append(tag);tr.append(td);
+
+const actionCell = document.createElement('td');
+const deleteButton = document.createElement('button');
+
+deleteButton.type = 'button';
+deleteButton.textContent = '🗑️ Delete';
+deleteButton.className = 'td-delete-button';
+
+deleteButton.addEventListener('click', async () => {
+ const student = tdRecords.find(([id]) => id === uid);
+if (!student) return;
+
+const profile = student[1].profile || {};
+const name = [profile.firstName, profile.lastName]
+  .filter(Boolean).join(' ');
+
+if (!window.confirm(
+  `Delete student record?\n\nName: ${name}\nGrade: ${profile.grade || '-'}\nSchool: ${profile.school || '-'}\n\nThis cannot be undone.`
+)) return;
+
+const teacher = teacherAuth.currentUser;
+if (!teacher) {
+  alert('Please sign in as a teacher.');
+  return;
+}
+
+const allowed = await get(
+  ref(teacherDb, 'teacherAdmins/' + teacher.uid)
+);
+if (allowed.val() !== true) {
+  alert('Teacher authorization failed.');
+  return;
+}
+
+deleteButton.disabled = true;
+deleteButton.textContent = 'Deleting...';
+
+try {
+  await remove(ref(teacherDb, 'studentAccounts/' + uid));
+  alert('Student record deleted successfully!');
+} catch (error) {
+  alert('Deletion failed: ' + error.message);
+} finally {
+  deleteButton.disabled = false;
+  deleteButton.textContent = '🗑️ Delete';
+}
+});
+
+actionCell.append(deleteButton);
+tr.append(actionCell);
+tbody.append(tr);
  }
  table.append(tbody);host.append(table)
 }
