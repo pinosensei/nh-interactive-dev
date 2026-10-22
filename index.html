@@ -1083,6 +1083,10 @@ overflow-y:auto;
     <h2 id="speakingQuestion"></h2><div id="speakingPicture" class="hidden" style="max-width:570px;margin:14px auto;border:3px solid #dbeafe;border-radius:22px;overflow:hidden;background:#fff"></div><p id="speakingJapanese" class="fill-japanese-hint"></p>
     <button id="speakingListen" class="secondary-btn">🔊 Hear question again</button>
     <div style="margin:22px 0"><button id="speakingMic" class="primary-btn" style="font-size:1.35rem;padding:18px 28px">🎤 Tap to Speak</button></div>
+    <form id="pronounTyping" class="hidden" autocomplete="off" style="max-width:470px;margin:8px auto 12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
+      <input id="pronounTypedAnswer" type="text" aria-label="Type the pronoun" placeholder="Type the answer / 答えを入力" maxlength="30" style="flex:1;min-width:180px;border:2px solid var(--line);border-radius:12px;padding:12px;background:var(--card);color:var(--text)">
+      <button id="pronounSubmit" class="primary-btn" type="submit">⌨️ Check Answer</button>
+    </form>
     <p id="speakingStatus" aria-live="polite">Listen, then answer in English.</p>
     <p><b>You said:</b> <span id="speakingHeard">—</span></p>
     <p id="speakingFeedback" class="feedback" aria-live="polite"></p>
@@ -3332,6 +3336,7 @@ el('teacherLoginSubmit').addEventListener('click',async()=>{
     return mode==='advanced'?'What did you learn from our conversation?':'Did you enjoy our conversation? Why?';
   }
   function render(){
+    el('pronounTyping').classList.toggle('hidden',topic!=='pronouns');el('pronounTypedAnswer').value='';el('pronounTypedAnswer').disabled=false;el('pronounSubmit').disabled=false;
     stop();awarded=false;el('speakingHeard').textContent='—';el('speakingFeedback').textContent='';el('speakingCorrection').classList.add('hidden');el('speakingNext').classList.add('hidden');
     if(turn>=(pictureTopic()?20:8)){
       el('speakingPicture').classList.add('hidden');
@@ -3346,7 +3351,7 @@ el('teacherLoginSubmit').addEventListener('click',async()=>{
     el('speakingListen').disabled=false;el('speakingRetry').disabled=false;
     el('speakingCount').textContent=pictureTopic()?`Question ${turn+1} / 20  •  ❤️ ${lives} lives`:`Turn ${turn+1} / 8`;el('speakingScore').textContent=pictureTopic()?`${score} correct  •  🪙 ${score*5} potential coins`:score+' completed';
     el('speakingQuestion').textContent=question();el('speakingJapanese').textContent=topic==='pronouns'?themes.pronouns.jp:turn===0?themes[topic].jp:'英語で自由に答えましょう。';
-    el('speakingStatus').textContent=Recognition?'Listen, then answer in English.':'Speech recognition is unavailable. Try Chrome or Edge on the HTTPS website.';
+    el('speakingStatus').textContent=topic==='pronouns'?'Speak or type the English pronoun. / 英語で話すか入力してください。':Recognition?'Listen, then answer in English.':'Speech recognition is unavailable. Try Chrome or Edge on the HTTPS website.';
     el('speakingMic').disabled=!Recognition;
     const current=session;
     say(el('speakingQuestion').textContent,()=>{if(current===session&&el('speakingAuto').checked&&!awarded)listen()});
@@ -3357,6 +3362,7 @@ el('teacherLoginSubmit').addEventListener('click',async()=>{
     roundOver=true;awarded=true;stop();session++;
     if('speechSynthesis' in window)window.speechSynthesis.cancel();speaking=false;
     el('speakingPicture').classList.add('hidden');
+    el('pronounTyping').classList.add('hidden');
     el('speakingListen').disabled=true;el('speakingMic').disabled=true;el('speakingRetry').disabled=true;
     el('speakingNext').classList.add('hidden');
     el('speakingCount').textContent=won?'🏆 Challenge Complete':'💔 Game Over';
@@ -3375,6 +3381,7 @@ el('teacherLoginSubmit').addEventListener('click',async()=>{
   function advancePictureRound(){if(roundOver)return;turn++;render()}
   function answer(s){
     if(awarded||roundOver)return;
+    if(topic==='pronouns'){el('pronounTypedAnswer').disabled=true;el('pronounSubmit').disabled=true;}
     el('speakingHeard').textContent=s;
     const check=validate(s);
     if(check.ok){
@@ -3452,6 +3459,7 @@ el('teacherLoginSubmit').addEventListener('click',async()=>{
       showSpeakingReview(el('speakingTopic').value);stop();el('speakingSetup').classList.add('hidden');el('speakingPrepReview').classList.remove('hidden');window.scrollTo({top:0,behavior:'instant'});
     }else start();
   };el('speakingListen').onclick=()=>{if(!roundOver&&turn<(pictureTopic()?20:8)){stop();say(el('speakingQuestion').textContent)}};
+  el('pronounTyping').addEventListener('submit',e=>{e.preventDefault();if(topic!=='pronouns'||awarded||roundOver)return;const value=el('pronounTypedAnswer').value.trim();if(!value)return;stop();answer(value)});
   el('speakingMic').onclick=listen;el('speakingRetry').onclick=listen;
   el('speakingNext').onclick=()=>{if(awarded&&!roundOver){if(pictureTopic()&&lives===0){finishPictureRound(false)}else{turn++;render()}}};
 })();
