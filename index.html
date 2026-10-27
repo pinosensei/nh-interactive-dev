@@ -3465,5 +3465,406 @@ el('teacherLoginSubmit').addEventListener('click',async()=>{
 })();
 
 </script>
+<style id="nh-design-step1">
+/* =====================================================================
+   NH Interactive: New Design, STEP 1
+   Colors, fonts, top bar and home page.
+   CSS only: no JavaScript, IDs or saved student data are changed.
+   To undo this step, delete this whole <style> block.
+   ===================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Orbitron:wght@600;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap");
+
+/* ---------- 1. Color tokens ---------- */
+/* Light mode = "Clean Pro" */
+:root{
+  --bg:#F4F7FB; --card:#FFFFFF; --text:#10233A; --muted:#5B6B7E; --line:#E3E9F1;
+  --brand:#2563EB; --brand-ink:#FFFFFF; --soft:#EAF1FE;
+  --shadow:0 10px 30px rgba(16,35,58,.08);
+  --glass:#FFFFFF; --hud:#FFFFFF; --violet:#7C3AED;
+  --nh1:#2563EB; --nh2:#15803D; --nh3:#DC2626;
+  --font:"Sora","Noto Sans JP",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-num:"Sora","Noto Sans JP",system-ui,sans-serif;
+}
+/* Dark mode = "Futuristic HUD" */
+body.dark{
+  --bg:#070B1A; --card:#0F1833; --text:#EAF0FF; --muted:#9AA8C7; --line:rgba(120,160,255,.22);
+  --brand:#3EE0FF; --brand-ink:#04101F; --soft:#16224A;
+  --shadow:0 18px 50px rgba(0,0,0,.45);
+  --glass:rgba(14,22,48,.66); --hud:rgba(14,22,48,.85); --violet:#8B7CFF;
+  --nh1:#3EE0FF; --nh2:#4ADE80; --nh3:#FF6F98;
+  --font-num:"Orbitron","Sora",sans-serif;
+}
+
+/* ---------- 2. Page, fonts, background ---------- */
+body{font-family:var(--font);background:var(--bg);color:var(--text)}
+h1,h2,h3{font-family:var(--font);letter-spacing:-.015em}
+h1{font-weight:800}
+.eyebrow{letter-spacing:.2em}
+body.dark{
+  background-color:#070B1A;
+  background-image:
+    radial-gradient(900px 520px at 90% -10%, rgba(139,124,255,.20), transparent 60%),
+    radial-gradient(800px 520px at -5% 15%, rgba(62,224,255,.11), transparent 60%),
+    linear-gradient(rgba(120,160,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120,160,255,.045) 1px, transparent 1px);
+  background-size:auto,auto,48px 48px,48px 48px;
+  background-attachment:fixed;
+}
+
+/* ---------- 3. Top bar (HUD) ---------- */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  padding-top:12px; padding-bottom:12px;
+  background:var(--bg);
+  box-shadow:0 0 0 100vmax var(--bg), 0 1px 0 100vmax var(--line);
+  clip-path:inset(0 -100vmax -1px);
+}
+body.dark .topbar{background:rgba(7,11,26,.88);box-shadow:0 0 0 100vmax rgba(7,11,26,.88), 0 1px 0 100vmax var(--line)}
+.logo-btn strong{font-weight:800;letter-spacing:-.01em}
+body.dark .logo-btn strong{letter-spacing:.02em}
+
+/* Logo: emoji -> icon tile */
+.logo-icon{font-size:0!important;width:44px;height:44px;border-radius:13px;flex:0 0 44px;display:grid;place-items:center;
+  background:var(--brand)}
+body.dark .logo-icon{background:linear-gradient(135deg,#3EE0FF,#8B7CFF);box-shadow:0 0 22px rgba(62,224,255,.35)}
+.logo-icon::before{content:"";width:24px;height:24px;background:var(--brand-ink);
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z'/%3E%3C/svg%3E") center/contain no-repeat}
+
+/* Stat pills joined into one HUD bar */
+.top-actions{gap:6px}
+.top-actions .pill{
+  font-size:0; height:44px; display:inline-flex; align-items:center; gap:7px;
+  padding:0 13px; background:var(--hud); border:1px solid var(--line); border-radius:0;
+}
+.top-actions .pill + .pill{margin-left:-6px;border-left:0}
+.top-actions span.pill:first-of-type{border-radius:14px 0 0 14px}
+.top-actions span.pill:last-of-type{border-radius:0 14px 14px 0;margin-right:6px}
+.top-actions .pill b{font-size:14px;font-weight:700;font-family:var(--font-num);color:var(--text)}
+.top-actions .pill::before{content:"";width:17px;height:17px;flex:0 0 17px;background:currentColor}
+.top-actions .pill:has(#xpValue){color:#B45309}
+.top-actions .pill:has(#xpValue)::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/%3E%3C/svg%3E") center/contain no-repeat}
+.top-actions .pill:has(#levelValue)::before{content:"LV";width:auto;flex:none;background:none;font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--muted)}
+.top-actions .pill:has(#streakValue){color:#C2410C}
+.top-actions .pill:has(#streakValue)::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z'/%3E%3C/svg%3E") center/contain no-repeat}
+.top-actions .pill:has(#avatarCoinValue){color:#A16207}
+.top-actions .pill:has(#avatarCoinValue)::before{-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4'/%3E%3C/svg%3E") center/contain no-repeat}
+body.dark .top-actions .pill:has(#xpValue){color:#FFD66B}
+body.dark .top-actions .pill:has(#streakValue){color:#FF9E6B}
+body.dark .top-actions .pill:has(#avatarCoinValue){color:#FFC94D}
+
+/* Icon buttons: emoji -> clean line icons */
+.top-actions .icon-btn{
+  font-size:0!important; width:44px; height:44px; padding:0; display:inline-grid; place-items:center;
+  background:var(--hud); border:1px solid var(--line); border-radius:13px; color:var(--text);
+  transition:transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.top-actions .icon-btn:hover{transform:translateY(-2px);border-color:var(--brand)}
+body.dark .top-actions .icon-btn:hover{box-shadow:0 0 18px rgba(62,224,255,.25)}
+.top-actions .icon-btn::before{content:"";width:20px;height:20px;background:currentColor;
+  -webkit-mask-position:center;-webkit-mask-size:contain;-webkit-mask-repeat:no-repeat;
+  mask-position:center;mask-size:contain;mask-repeat:no-repeat}
+#avatarBtn::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21a8 8 0 0 1 16 0'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21a8 8 0 0 1 16 0'/%3E%3C/svg%3E")}
+#shopBtn::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z'/%3E%3Cpath d='M3 6h18M16 10a4 4 0 0 1-8 0'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z'/%3E%3Cpath d='M3 6h18M16 10a4 4 0 0 1-8 0'/%3E%3C/svg%3E")}
+#inventoryBtn::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z'/%3E%3Cpath d='M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M8 21v-5h8v5'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z'/%3E%3Cpath d='M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M8 21v-5h8v5'/%3E%3C/svg%3E")}
+#languageBtn::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z'/%3E%3C/svg%3E")}
+#soundBtn::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4z'/%3E%3Cpath d='M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4z'/%3E%3Cpath d='M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14'/%3E%3C/svg%3E")}
+#soundBtn[data-off="1"]::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4z'/%3E%3Cpath d='M22 9l-6 6M16 9l6 6'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4z'/%3E%3Cpath d='M22 9l-6 6M16 9l6 6'/%3E%3C/svg%3E")}
+#themeBtn::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41'/%3E%3C/svg%3E")}
+body.dark #themeBtn::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'/%3E%3C/svg%3E");mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'/%3E%3C/svg%3E")}
+
+/* ---------- 4. Buttons ---------- */
+.primary-btn,.secondary-btn,.adventure-btn{min-height:46px;border-radius:14px;font-weight:700;transition:transform .15s ease, box-shadow .2s ease}
+.primary-btn:hover,.secondary-btn:hover,.adventure-btn:hover{transform:translateY(-2px)}
+.primary-btn{background:var(--brand);color:var(--brand-ink);box-shadow:0 8px 20px rgba(37,99,235,.22)}
+body.dark .primary-btn{box-shadow:0 0 24px rgba(62,224,255,.35)}
+.secondary-btn{background:var(--soft);color:var(--text)}
+.adventure-btn{background:var(--card);color:var(--text);border:1px solid var(--line);box-shadow:none}
+body.dark .adventure-btn{background:rgba(139,124,255,.12);border-color:rgba(139,124,255,.45)}
+body.dark .adventure-btn:hover{box-shadow:0 0 20px rgba(139,124,255,.3)}
+
+/* ---------- 5. Home page ---------- */
+.dashboard-hero{background:var(--card);border:1px solid var(--line);color:var(--text);border-radius:26px}
+body.dark .dashboard-hero{background:var(--glass);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.06), var(--shadow)}
+.dashboard-hero h1{letter-spacing:-.02em}
+
+.level-orb{background:var(--bg);border:6px solid var(--brand);box-shadow:none}
+.level-orb b{font-family:var(--font-num);font-weight:800}
+.level-orb span,.level-orb small{color:var(--muted)}
+body.dark .level-orb{background:radial-gradient(circle at 50% 40%, rgba(62,224,255,.16), rgba(7,11,26,.9) 70%);
+  box-shadow:0 0 30px rgba(62,224,255,.35), inset 0 0 20px rgba(62,224,255,.15)}
+
+.dashboard-stat,.dashboard-panel{border-radius:20px}
+body.dark .dashboard-stat,body.dark .dashboard-panel{background:var(--glass);box-shadow:none}
+.dashboard-stat b{font-family:var(--font-num)}
+.achievement{border-radius:14px}
+
+/* Textbook cards: emoji book -> big glowing number */
+.grade-card{background:var(--card)!important;color:var(--text);border:1px solid var(--line);border-radius:22px;
+  box-shadow:var(--shadow);transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease}
+.grade-card:hover{transform:translateY(-4px)}
+.grade-card h2{font-size:clamp(1.45rem,2.1vw,1.9rem);white-space:nowrap}
+.grade-card small{font-weight:700}
+.grade-blue{--g:var(--nh1)} .grade-green{--g:var(--nh2)} .grade-red{--g:var(--nh3)}
+.grade-card small,.grade-card > b{color:var(--g)}
+.grade-card{box-shadow:inset 0 5px 0 var(--g), var(--shadow)}
+body.dark .grade-card{background:linear-gradient(160deg, color-mix(in srgb, var(--g) 16%, transparent), rgba(14,22,48,.75) 55%)!important;
+  border-color:color-mix(in srgb, var(--g) 35%, transparent);box-shadow:none}
+body.dark .grade-card:hover{border-color:var(--g);box-shadow:0 0 30px color-mix(in srgb, var(--g) 22%, transparent)}
+.nh-original-book-icon{font-size:0!important;width:84px!important;height:auto!important}
+.nh-original-book-icon::before{font-family:var(--font-num);font-size:52px;font-weight:800;line-height:1;color:var(--g)}
+body.dark .nh-original-book-icon::before{text-shadow:0 0 22px var(--g)}
+.grade-blue .nh-original-book-icon::before{content:"01"}
+.grade-green .nh-original-book-icon::before{content:"02"}
+.grade-red .nh-original-book-icon::before{content:"03"}
+.hero-icon{display:none}
+
+/* Teacher Portal button (it has inline styles, so !important is needed) */
+#teacherPortalBtn{background:var(--card)!important;border:1px solid var(--line)!important;box-shadow:var(--shadow)!important}
+#teacherPortalBtn strong{color:var(--text)!important}
+#teacherPortalBtn div:last-child{color:var(--muted)!important}
+
+.primary-btn *{color:inherit!important;opacity:.85}
+body.dark .mission-reward{background:rgba(255,201,77,.1);border:1px solid rgba(255,201,77,.35);color:#FFE29A}
+
+/* ---------- 6. Small screens (phones) ---------- */
+@media(max-width:720px){
+  .topbar{position:relative;flex-wrap:wrap;gap:12px}
+  .top-actions{width:100%;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:8px 0}
+  .top-actions .pill{grid-column:span 3;margin:0!important;padding:0 6px;justify-content:center;min-width:0}
+  .top-actions .pill + .pill{margin-left:0!important}
+  .top-actions .icon-btn{grid-column:span 2;width:auto;margin:0 3px}
+}
+</style>
+<style id="nh-design-step2">
+/* =====================================================================
+   NH Interactive: New Design, STEP 2
+   Textbook pages: unit list, study page, flashcards, quiz and games.
+   CSS only: no JavaScript, IDs or saved student data are changed.
+   Needs STEP 1 above it. To undo this step, delete this whole block.
+   ===================================================================== */
+
+/* ---------- 1. Shared bits ---------- */
+:root{--ok-bg:#DCFCE7;--ok-line:#16A34A;--ok-ink:#14532D;--no-bg:#FEE2E2;--no-line:#DC2626;--no-ink:#7F1D1D;--track:#E3E9F1}
+body.dark{--ok-bg:rgba(74,222,128,.14);--ok-line:#4ADE80;--ok-ink:#BBF7D0;--no-bg:rgba(255,111,152,.14);--no-line:#FF6F98;--no-ink:#FFD1DE;--track:rgba(120,160,255,.16)}
+
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+
+/* Home / Back buttons: smaller, tidy outline pill */
+.home-btn,.back-btn.home-btn{
+  display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px!important;margin:18px 0 6px;
+  font-size:1rem!important;font-weight:700;color:var(--text);background:var(--card);
+  border:1px solid var(--line);border-radius:999px;box-shadow:none;transition:transform .15s ease,border-color .2s ease;
+}
+.home-btn:hover{transform:translateY(-1px);border-color:var(--brand);background:var(--card)}
+.home-divider{color:var(--muted)}
+
+/* Page titles */
+.page-heading,.study-heading{padding:22px 0 24px}
+.page-heading h1,.study-heading h1{font-size:clamp(2rem,4.2vw,3.1rem);margin:6px 0 10px;letter-spacing:-.02em}
+.page-heading .hero-icon{display:none}
+
+/* ---------- 2. Unit list ---------- */
+.unit-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.unit-card{
+  border-radius:20px;padding:20px 22px;min-height:140px;box-shadow:none;
+  display:flex;flex-direction:column;align-items:flex-start;gap:4px;
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.unit-card:not(.locked):hover{transform:translateY(-3px);border-color:var(--brand);box-shadow:var(--shadow)}
+.unit-card h3{font-size:1.25rem;font-weight:800;margin:10px 0 4px}
+.unit-card p{font-size:.92rem;line-height:1.5}
+.unit-card .badge{
+  display:inline-block;padding:4px 10px;border-radius:999px;font-size:.68rem;font-weight:800;letter-spacing:.08em;
+  background:var(--ok-bg);color:var(--ok-ink);
+}
+.unit-card.locked{opacity:1;background:var(--bg);border-style:dashed}
+.unit-card.locked h3,.unit-card.locked p{color:var(--muted)}
+.unit-card.locked .badge{background:var(--line);color:var(--muted)}
+.special-card{border-width:1px}
+.special-card .badge{background:#FEF3C7;color:#78350F}
+body.dark .special-card .badge{background:rgba(255,201,77,.14);color:#FFE29A}
+
+/* Grade Quest banner */
+.grade-adventure-card{
+  background:#10233A!important;color:#FFFFFF;border:0;min-height:120px;padding:24px 28px;
+  box-shadow:0 12px 30px rgba(16,35,58,.18);
+}
+.grade-adventure-card h3{color:#FFFFFF;font-size:1.45rem}
+.grade-adventure-card p{color:#C9D6E6}
+.grade-adventure-card .badge{background:rgba(255,255,255,.14);color:#FFFFFF!important}
+.grade-adventure-card:hover{box-shadow:0 16px 36px rgba(16,35,58,.26)!important}
+body.dark .grade-adventure-card{background:linear-gradient(135deg,rgba(139,124,255,.28),rgba(62,224,255,.14))!important;border:1px solid rgba(139,124,255,.45)}
+
+/* ---------- 3. Study page header ---------- */
+.stats{gap:8px}
+.stats span{border-radius:14px;padding:10px 16px;min-width:96px;box-shadow:none}
+.stats small{font-size:.75rem;font-weight:600}
+.stats b{font-family:var(--font-num);font-size:1.35rem;font-weight:800}
+
+.progress-card{border-radius:16px;padding:16px 20px;box-shadow:none}
+.progress-label b{font-weight:700}
+.progress-label span{color:var(--muted);font-weight:600}
+.progress-track{height:10px;background:var(--track)}
+.progress-track i{border-radius:999px}
+body.dark .progress-track i{box-shadow:0 0 10px rgba(62,224,255,.6)}
+
+/* Game mode buttons */
+.mode-nav{gap:10px;margin:20px 0 26px}
+.mode-btn{
+  min-height:64px;border-radius:14px;padding:10px 8px;font-weight:700;font-size:.95rem;
+  transition:transform .15s ease,border-color .2s ease,background .2s ease;
+}
+.mode-btn:hover{transform:translateY(-2px);border-color:var(--brand)}
+.mode-btn small{font-size:.72rem;margin-top:2px}
+.mode-btn.active{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);box-shadow:0 8px 18px rgba(37,99,235,.22)}
+.mode-btn.active small{color:var(--brand-ink);opacity:.85}
+body.dark .mode-btn{background:var(--glass)}
+body.dark .mode-btn.active{background:var(--brand);box-shadow:0 0 20px rgba(62,224,255,.35)}
+
+/* ---------- 4. Flashcards ---------- */
+.game-head h2{font-size:1.6rem;font-weight:800;margin:0 0 4px}
+.game-head p{margin:0}
+.filter-bar input,.filter-bar select,.filter-bar button{min-height:46px;border-radius:12px}
+.filter-bar input,.filter-bar select{background:var(--card);border:1px solid var(--line);color:var(--text);padding:0 14px}
+.filter-result{font-size:.9rem}
+.flashcard-grid{gap:16px;margin-top:16px}
+.flash-face{border-radius:20px;border:1px solid rgba(16,35,58,.06);box-shadow:0 4px 14px rgba(16,35,58,.06);color:#10233A}
+.flashcard:hover .flash-face{box-shadow:0 12px 26px rgba(16,35,58,.12)}
+.flash-word{font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+.word-chip{background:rgba(255,255,255,.7);color:#10233A;font-weight:700}
+body.dark .flash-face{border-color:rgba(255,255,255,.08);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+
+/* ---------- 5. Quiz, Speed, Fill Blank, Spelling, Hangman panels ---------- */
+.panel{border-radius:24px;padding:32px;box-shadow:var(--shadow)}
+body.dark .panel{background:var(--glass)}
+.panel h2{font-size:clamp(1.6rem,3.4vw,2.2rem);font-weight:800;letter-spacing:-.01em}
+.game-top{font-weight:600;font-size:.9rem}
+.hint{font-weight:700;letter-spacing:.02em}
+.choice-grid{gap:12px}
+.choice{
+  min-height:56px;background:var(--card);border:2px solid var(--line);border-radius:14px;
+  font-weight:700;font-size:1.05rem;transition:transform .12s ease,border-color .15s ease,background .15s ease;
+}
+.choice:hover:not(:disabled){border-color:var(--brand);background:var(--soft);transform:translateY(-1px)}
+.choice.correct{background:var(--ok-bg)!important;border-color:var(--ok-line)!important;color:var(--ok-ink)!important}
+.choice.wrong{background:var(--no-bg)!important;border-color:var(--no-line)!important;color:var(--no-ink)!important}
+.input-row input{min-height:50px;background:var(--card);border:2px solid var(--line);border-radius:14px;font-size:1.05rem}
+.input-row input:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 4px color-mix(in srgb,var(--brand) 18%,transparent)}
+
+/* ---------- 6. Matching, Memory, Hangman ---------- */
+.match-item{background:var(--card);border-radius:14px;min-height:50px;font-weight:700;transition:border-color .15s ease,background .15s ease}
+.match-item:hover{border-color:var(--brand)}
+.match-item.selected{outline:0;border-color:var(--brand);background:var(--soft)}
+.memory-card{border-radius:16px;border:0;font-size:1rem;transition:transform .15s ease,background .2s ease}
+.memory-card:hover{transform:translateY(-2px)}
+.memory-card:not(.revealed):not(.matched){background:var(--brand);color:var(--brand-ink);
+  background-image:radial-gradient(rgba(255,255,255,.18) 1.5px,transparent 1.5px);background-size:14px 14px}
+.memory-card.revealed{background:var(--card);border:2px solid var(--brand)}
+.memory-card.matched{background:var(--ok-bg);color:var(--ok-ink);border:2px solid var(--ok-line);opacity:.6}
+.letter-grid button{background:var(--card);border-radius:10px;min-height:42px;font-weight:700;transition:border-color .15s ease}
+.letter-grid button:hover:not(:disabled){border-color:var(--brand)}
+
+/* ---------- 7. Small screens ---------- */
+@media(max-width:720px){
+  .study-heading .stats{width:100%}
+  .stats span{flex:1;min-width:0}
+  .panel{padding:22px 18px}
+}
+
+/* Stat boxes: only the outer box is a card (bilingual labels add inner spans) */
+.stats > span{display:flex;flex-direction:column;justify-content:center}
+.stats span span{background:none!important;border:0!important;padding:0!important;min-width:0!important;border-radius:0!important;display:block}
+@media(max-width:720px){
+  .study-heading .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+<style id="nh-design-step3">
+/* =====================================================================
+   NH Interactive: New Design, STEP 3
+   Avatar, Shop and Inventory windows.
+   CSS only: no JavaScript, IDs or saved student data are changed.
+   Needs STEPS 1-2 above it. To undo this step, delete this whole block.
+   ===================================================================== */
+
+/* ---------- 1. Window backdrop ---------- */
+#nhAvatarModal,#nhShopModal,#nhInventoryModal{background:rgba(16,35,58,.5);backdrop-filter:blur(10px)}
+body.dark #nhAvatarModal,body.dark #nhShopModal,body.dark #nhInventoryModal{background:rgba(3,6,16,.72)}
+
+/* ---------- 2. Window box + header ---------- */
+.nh-avatar-box,.nh-shop-box,.nh-inventory-box{
+  border-radius:24px;border:1px solid var(--line);
+  box-shadow:0 30px 80px rgba(16,35,58,.25);
+}
+body.dark .nh-avatar-box,body.dark .nh-shop-box,body.dark .nh-inventory-box{box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(62,224,255,.08)}
+.nh-avatar-header,.nh-shop-header,.nh-inventory-header{
+  position:sticky;top:0;z-index:5;background:var(--card);
+  padding:18px 24px;border-bottom:1px solid var(--line);
+}
+.nh-avatar-header h2,.nh-shop-header h2,.nh-inventory-header h2{font-size:1.5rem;font-weight:800;letter-spacing:-.01em}
+.nh-avatar-header small,.nh-shop-header small,.nh-inventory-header small{font-size:.85rem}
+#nhAvatarClose,#nhShopClose,#nhInventoryClose{
+  width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+  font-size:24px;line-height:1;transition:transform .15s ease,border-color .2s ease,background .2s ease;
+}
+#nhAvatarClose:hover,#nhShopClose:hover,#nhInventoryClose:hover{border-color:var(--brand);background:var(--soft);transform:rotate(90deg)}
+
+.nh-avatar-body{padding:24px 28px 32px}
+.nh-shop-body,.nh-inventory-body{padding:24px 28px 32px}
+.nh-avatar-title p,.nh-shop-body > p,.nh-inventory-body > p{margin:0;font-size:1.15rem}
+.nh-avatar-title small,.nh-shop-body > small,.nh-inventory-body > small{color:var(--muted)}
+
+/* ---------- 3. Avatar category tabs ---------- */
+.nh-avatar-tabs{gap:8px;margin:18px 0 20px}
+.nh-avatar-tab{
+  min-height:42px;padding:0 16px;border-radius:999px;background:var(--card);border:1px solid var(--line);
+  font-size:.92rem;font-weight:700;transition:border-color .15s ease,background .15s ease;
+}
+.nh-avatar-tab:hover{border-color:var(--brand)}
+.nh-avatar-tab.active{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+body.dark .nh-avatar-tab.active{box-shadow:0 0 16px rgba(62,224,255,.35)}
+
+/* ---------- 4. Character / item cards (avatar, shop, inventory) ---------- */
+.nh-character-grid,.nh-shop-grid,.nh-inventory-grid{gap:16px;grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.nh-character-card,.nh-shop-card,.nh-inventory-card{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 12px 14px;gap:8px;
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.nh-character-card:hover,.nh-shop-card:hover,.nh-inventory-card:hover{transform:translateY(-3px);border-color:var(--brand);box-shadow:var(--shadow)}
+body.dark .nh-character-card:hover,body.dark .nh-shop-card:hover,body.dark .nh-inventory-card:hover{box-shadow:0 0 22px rgba(62,224,255,.18)}
+.nh-character-card img,.nh-shop-card img,.nh-inventory-card img{
+  background:var(--bg);border-radius:12px;padding:8px;box-sizing:border-box;
+}
+.nh-character-card strong,.nh-shop-card strong,.nh-inventory-card strong{font-size:.95rem;font-weight:700}
+
+/* Status tag: "✓ Owned", "✓ Equipped", "🪙 120" */
+.nh-character-status{
+  display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:999px;
+  background:var(--soft);color:var(--brand);font-size:.78rem;font-weight:800;
+}
+body.dark .nh-character-status{background:rgba(62,224,255,.12)}
+
+/* Coin wallet in the shop */
+.nh-shop-wallet{
+  display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;
+  background:#FEF3C7;border:1px solid #FCD34D;color:#78350F;font-size:1.05rem;margin-bottom:20px;
+}
+.nh-shop-wallet b{font-family:var(--font-num);font-size:1.2rem}
+body.dark .nh-shop-wallet{background:rgba(255,201,77,.12);border-color:rgba(255,201,77,.4);color:#FFE29A}
+
+/* Custom avatar editor */
+.nh-custom-editor-preview{background:var(--bg);border-radius:20px}
+#nhCustomOptionGrid{gap:12px}
+
+/* ---------- 5. Small screens ---------- */
+@media(max-width:620px){
+  #nhAvatarModal,#nhShopModal,#nhInventoryModal{padding:10px}
+  .nh-avatar-box,.nh-shop-box,.nh-inventory-box{width:100%;max-height:calc(100vh - 20px);height:calc(100vh - 20px)}
+  .nh-avatar-body,.nh-shop-body,.nh-inventory-body{padding:18px 16px 24px}
+  .nh-character-grid,.nh-shop-grid,.nh-inventory-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .nh-avatar-tabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;padding-bottom:6px;scrollbar-width:none}
+  .nh-avatar-tab{flex:0 0 auto}
+  .nh-custom-editor-layout{grid-template-columns:1fr}
+}
+</style>
 </body>
 </html>
