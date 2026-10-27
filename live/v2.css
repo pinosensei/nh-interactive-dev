@@ -140,3 +140,51 @@ body.projector #q-type{display:none !important}
 
 /* Stage 1 (integration): link back to the main NH Interactive page */
 .backlink{display:inline-block;text-decoration:none;color:var(--ink);margin-top:14px}
+
+/* ===== Race layout: question on the LEFT, live board on the RIGHT =====
+   Only on screens 760px and wider (tablets, laptops, PCs). Phones keep the one-column layout.
+   Styles only: no JavaScript, Firebase paths or data shapes change.
+   To undo: delete everything from this comment down. */
+@media (min-width:760px){
+  /* wider white box while a race is on screen */
+  body:has(#race:not([hidden]) #live:not([hidden])) .app{max-width:1180px}
+
+  /* two columns: questions (left) and live board (right) */
+  #race:has(#live:not([hidden])){
+    display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,1fr);
+    column-gap:22px;align-items:start;
+  }
+  #race:has(#live:not([hidden])) > *{grid-column:1 / -1}
+  #race:has(#live:not([hidden])) > #play,
+  #race:has(#live:not([hidden])) > #my-done,
+  #race:has(#live:not([hidden])) > #spectator-note{grid-column:1;grid-row:3}
+  #race:has(#live:not([hidden])) > #live{
+    grid-column:2;grid-row:3 / span 2;margin-top:14px;
+    position:sticky;top:12px;max-height:calc(100dvh - 24px);overflow:auto;text-align:left;
+  }
+  #race:has(#live:not([hidden])) > #play,
+  #race:has(#live:not([hidden])) > #my-done{margin-top:14px}
+
+  /* a little more compact so everything fits on one screen */
+  #race:has(#live:not([hidden])) #race-title{margin:0;font-size:1.3rem}
+  #race:has(#live:not([hidden])) .countdown{font-size:1.6rem;margin:4px 0}
+  #race:has(#live:not([hidden])) .qword{font-size:2.2rem;margin:6px 0 12px}
+  #race:has(#live:not([hidden])) .choices{grid-template-columns:1fr 1fr;gap:10px}
+  #race:has(#live:not([hidden])) .choices button{min-height:64px;text-align:center}
+  #live .label{position:sticky;top:-14px;background:#fff;padding:6px 0;margin:-6px 0 8px;z-index:1}
+  #live .board li{padding:4px 6px}
+  #live .board li.me{outline:3px solid var(--ink);background:var(--sun)}
+
+  /* compact header: Sound/Vibration buttons float top-right, title + GO! share one row */
+  body:has(#race:not([hidden]) #live:not([hidden])) .app{position:relative;padding-top:18px}
+  body:has(#race:not([hidden]) #live:not([hidden])) .prefs{position:absolute;top:16px;right:22px;margin:0}
+  #race:has(#live:not([hidden])) > #race-title{grid-column:1;grid-row:1;text-align:left;align-self:center}
+  #race:has(#live:not([hidden])) > #race-count{grid-column:1;grid-row:2;text-align:left}
+  /* compact board rows */
+  #live .board{gap:4px}
+  #live .board li{padding:3px 6px;row-gap:3px}
+  #live .board .bar{height:8px}
+  #race:has(#live:not([hidden])) > #live{max-height:calc(100dvh - 40px)}
+}
+/* projector view keeps its own full-width layout */
+body.projector #race{display:block !important}
