@@ -188,3 +188,9 @@ body.projector #q-type{display:none !important}
 }
 /* projector view keeps its own full-width layout */
 body.projector #race{display:block !important}
+
+/* Phase F2: Fill in the Blank (an English sentence with a blank; the Japanese sentence shows underneath as a hint) */
+.qword.sentence{font-size:1.55rem;line-height:1.4;font-weight:800;letter-spacing:.01em}
+.qword.sentence::after{font-size:.7em;font-weight:600;margin-top:6px;opacity:.8}
+@media (max-width:480px){.qword.sentence{font-size:1.25rem}}
+body.projector .qword.sentence{font-size:2rem}

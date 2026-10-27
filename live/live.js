@@ -1,3 +1,4 @@
+// Learn Live With Friends - v2, PHASE F2: adds Fill in the Blank (4 choices) and reads ../smart-sentences.js (same sentences + NH2 U5-7 lists as the main page).
 // Learn Live With Friends - v2, PHASE E2 (UNTESTED): adds the Spelling race mode (Japanese question, the student types the English).
 // Page-only: same rules, same data shapes. (Phase E1 added English -> Japanese; Phase D below.)
 // (Phase D below:)
@@ -47,7 +48,7 @@ let room = null;                        // { id, seat|null, nick, name, pw|null 
 let members = {}, hostUid = null, seatsReal = {}, presence = {}, entry = null;
 let unsubs = [], promoTimer = null, hbTimer = null, recovering = false, rc = 0, pwShown = false, pending = null;
 const sweepTried = new Set();
-let vocab = null, vocabErr = null, vocabLoading = false;           // the published portal-data.js (read only)
+let vocab = null, vocabErr = null, vocabLoading = false, hasSentences = false;   // portal-data.js (read only) + smart-sentences.js applied to our copy (Phase F2)
 let setupData = null, raceData = null, sel = { grade: "nh1", units: [], mode: V.MODES[0].id }, selDirty = false;
 let starting = false, setupT = null, stuckT = null, setupKey = "", verifyKey = "", armedLight = false, armQ = Promise.resolve(), raceTick = null;
 let hostNameTry = 0;
@@ -103,7 +104,7 @@ async function init() {
 async function loadVocab() {
   if (vocab || vocabLoading) return;
   vocabLoading = true;
-  try { vocab = await V.loadPortalData(); vocabErr = null; } catch (e) { vocab = null; vocabErr = e; console.error("vocabulary", e); }
+  try { const r = await V.withSentences(await V.loadPortalData()); vocab = r.data; hasSentences = r.sentences; vocabErr = null; } catch (e) { vocab = null; vocabErr = e; console.error("vocabulary", e); }
   finally { vocabLoading = false; }
   setupKey = ""; verifyKey = ""; if (room) render();
 }
@@ -426,7 +427,8 @@ function renderSetup(iAmHost, racers) {
       cb.disabled = !waiting || (!on && sel.units.length >= V.MAX_UNITS);
       if (cb.disabled && !on) lab.className = "off";
       cb.onchange = () => { sel.units = cb.checked ? [...new Set([...sel.units, u.number])] : sel.units.filter(x => x !== u.number); hostEdited(); };
-      const tt = document.createElement("span"); tt.textContent = "Unit " + u.number; const sm = document.createElement("small"); setT(sm, "unitWords", { n: u.count }); tt.append(sm);
+      if (V.isFill(sel.mode) && !u.count && !on) { cb.disabled = true; lab.className = "off"; }   // Fill in the Blank: no example sentences in this unit yet
+      const tt = document.createElement("span"); tt.textContent = "Unit " + u.number; const sm = document.createElement("small"); setT(sm, V.isFill(sel.mode) && !u.count ? "noSentences" : "unitWords", { n: u.count }); tt.append(sm);
       lab.append(cb, tt); box.append(lab);
     }
   }
@@ -843,10 +845,12 @@ function renderPlayMode(racer, over) {
   const i = eng.queue[0], shownKey = i + "|" + [...eng.wrong].join(",") + "|" + eng.locked + "|" + eng.solved.size;
   if (eng.shown === shownKey) return; eng.shown = shownKey;
   setT($("q-label"), "question", { n: eng.solved.size + 1, s: eng.solved.size });
-  $("q-word").textContent = V.promptOf(raceWords[i], eng.mode);
-  $("q-word").className = "qword" + (V.promptOf(raceWords[i], eng.mode).length > 16 ? " long" : "");
+  const fill = V.isFill(eng.mode), prompt = V.promptOf(raceWords[i], eng.mode) || "";
+  $("q-word").textContent = prompt;
+  $("q-word").className = "qword" + (fill ? " sentence" : prompt.length > 16 ? " long" : "");
+  if (fill && raceWords[i].exampleJP) $("q-word").setAttribute("data-ja", raceWords[i].exampleJP); else $("q-word").removeAttribute("data-ja");   // Japanese sentence as a hint
   const typing = V.isTyping(eng.mode);
-  setT($("q-ask"), typing ? "askType" : V.direction(eng.mode) === "en2jp" ? "askJa" : "whichWord");
+  setT($("q-ask"), typing ? "askType" : fill ? "askBlank" : V.direction(eng.mode) === "en2jp" ? "askJa" : "whichWord");
   $("q-choices").hidden = typing; $("q-type").hidden = !typing;
   if (typing) {   // Spelling: letter-count blanks (no letters revealed) and a text box that keeps its focus
     $("q-blanks").textContent = Sp.blankPattern(raceWords[i].english);

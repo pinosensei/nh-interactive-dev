@@ -71,6 +71,8 @@ export const S = {
   typeHere:     ["Type the English here", "ここに 英語を 入力"],
   enterBtn:     ["ENTER", "こたえる"],
   askJa:        ["What does it mean in Japanese?", "日本語の いみは どれ？"],
+  askBlank:     ["Which word goes in the blank?", "＿＿に 入る ことばは？"],
+  noSentences:  ["No example sentences yet", "まだ れいぶんが ありません"],
   modeUnsupported:["⚠️ This page doesn't know the host's game mode. Please reload the page.", "⚠️ このページは ホストの ゲームの しゅるいを しりません。ページを 再読み込みしてください。"],
   correct:      ["✅ Correct!", "✅ せいかい！"],
   tryAgain:     ["Not quite. Try again!", "おしい！ もう一度 チャレンジ！"],
@@ -159,6 +161,7 @@ export function t(key, vars = {}) {
 export const MODE_JA = {
   "jp2en-choice4": "日本語→英語（4択）",
   "en2jp-choice4": "英語→日本語（4択）",
-  "spelling": "スペリング（入力）"
+  "spelling": "スペリング（入力）",
+  "fillblank-choice4": "あなうめ（4たく）"
 };
 export const questionsJa = n => n + "問";

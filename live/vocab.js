@@ -5,16 +5,22 @@ import { EXCLUDE } from "./spelling-exceptions.js";
 // Fallback: the published copy at its full URL. Both are only ever READ.
 export const PORTAL_URL_LOCAL = "../portal-data.js";
 export const PORTAL_URL = "https://pinosensei.github.io/nh-interactive-dev/portal-data.js";
+// Phase F2: the shared Smart Sentences file (example sentences + the NH2 Unit 5-7 word-list corrections), same file the main page uses.
+export const SENTENCES_URL_LOCAL = "../smart-sentences.js";
+export const SENTENCES_URL = "https://pinosensei.github.io/nh-interactive-dev/smart-sentences.js";
 export const TOTAL = 40;        // questions per race
 export const MAX_UNITS = 4;     // units a host may combine
 export const SCHEMA_VERSION = 1;
 
-// Game modes: exactly three for now (Japanese -> English, English -> Japanese, Spelling).
+// Game modes (Phase F2 adds Fill in the Blank).
 export const MODES = [
   { id: "jp2en-choice4", label: "Japanese → English (4 choices)", available: true },
   { id: "en2jp-choice4", label: "English → Japanese (4 choices)", available: true },
-  { id: "spelling", label: "Spelling (typing)", available: true }
+  { id: "spelling", label: "Spelling (typing)", available: true },
+  { id: "fillblank-choice4", label: "Fill in the Blank (4 choices)", available: true }
 ];
+export const FILL = "fillblank-choice4";
+export const isFill = modeId => modeId === FILL;   // an English sentence with a blank; the student picks the missing word
 export const isTyping = modeId => modeId === "spelling";   // the student types the English instead of picking a choice
 export const modeLabel = id => (MODES.find(m => m.id === id) || { label: id }).label;
 
@@ -39,6 +45,23 @@ export async function loadPortalData(urls = [PORTAL_URL_LOCAL, PORTAL_URL], fetc
   }
   throw lastErr || new Error("portal-data.js: no source");
 }
+// Runs smart-sentences.js on a COPY of PORTAL_DATA, exactly as the main page runs it on its own copy:
+// adds exampleEN / exampleJP / fillBlankEN / answer fields and rebuilds the NH2 Unit 5-7 word lists.
+export function applySentences(data, text) {
+  const copy = structuredClone(data);
+  new Function("PORTAL_DATA", text)(copy);
+  return copy;
+}
+// Returns { data, sentences }: the vocabulary with the sentences applied, or the plain vocabulary if the file could not be loaded.
+export async function withSentences(data, urls = [SENTENCES_URL_LOCAL, SENTENCES_URL], fetchImpl = globalThis.fetch) {
+  for (const u of urls) {
+    try {
+      const res = await fetchImpl(u, { cache: "no-cache" }); if (!res.ok) continue;
+      return { data: applySentences(data, await res.text()), sentences: true };
+    } catch (e) { console.warn("smart-sentences.js", u, e); }
+  }
+  return { data, sentences: false };
+}
 
 /* ------------------------------------------------------------ word rules */
 const JP = /[぀-ヿ㐀-鿿]/;             // hiragana, katakana, kanji
@@ -58,23 +81,41 @@ const GRAMMAR_NOTE = /^\s*[\[［][^\]］]*[\]］]\s*$/;
 const PLACEHOLDER = /[…~～〜]|\.\.\./;
 const excluded = new Set(EXCLUDE.map(normEn));
 const spellable = w => !PLACEHOLDER.test(w.english || "") && !/^\s*\(/.test(w.english || "") && !excluded.has(normEn(w.english));
+// Fill in the Blank: needs a real blank sentence (not a generic "We use 'x' in this lesson." one), a Japanese sentence as the hint,
+// and a plain answer form. The answer form is read from the full sentence: "These ______ are delicious." + "These sweets are delicious." -> "sweets".
+const GENERIC = /use '.*' in this lesson/i;
+const BLANKS = /_{3,}(?:\s+_{3,})*/g;          // one blank, or several blanks in a row ("______ ______" = a two-word answer)
+const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const apos = s => String(s || "").replace(/[’‘`]/g, "'");
+function formFromSentence(w) {
+  const fb = apos(w.fillBlankEN), ex = apos(w.exampleEN || w.example);
+  if (!fb || !ex) return "";
+  const parts = fb.split(BLANKS); if (parts.length !== 2) return "";   // exactly one gap
+  const m = ex.match(new RegExp("^" + esc(parts[0]) + "(.+?)" + esc(parts[1]) + "$", "i"));
+  return m ? m[1].trim() : "";
+}
+export const fillForm = w => String(formFromSentence(w) || w.answer || (Array.isArray(w.acceptedAnswers) && w.acceptedAnswers[0]) || w.english || "").trim();
+const fillable = w => /_{3,}/.test(w.fillBlankEN || "") && !GENERIC.test(w.exampleEN || "") && JP.test(w.exampleJP || "")
+  && !!formFromSentence(w) && !/[()~～〜…⇐]/.test(fillForm(w)) && fillForm(w).length <= 30;   // the answer must rebuild the full sentence exactly
 const USABLE = {
   "jp2en-choice4": w => !!normEn(w.english) && JP.test(w.japanese || "") && !ARROW.test(w.japanese || ""),
   "spelling": w => !!normEn(w.english) && JP.test(w.japanese || "") && !ARROW.test(w.japanese || "") && spellable(w),
-  "en2jp-choice4": w => !!normEn(w.english) && JP.test(w.japanese || "") && !ARROW.test(w.japanese || "") && !GRAMMAR_NOTE.test(w.japanese || "")
+  "en2jp-choice4": w => !!normEn(w.english) && JP.test(w.japanese || "") && !ARROW.test(w.japanese || "") && !GRAMMAR_NOTE.test(w.japanese || ""),
+  "fillblank-choice4": w => !!normEn(w.english) && fillable(w)
 };
 export const isUsable = (w, modeId) => (USABLE[modeId] || USABLE["jp2en-choice4"])(w);
 
 /* ------------------------------------------------------------ question direction & choices */
 export const direction = modeId => (modeId === "en2jp-choice4" ? "en2jp" : "jp2en");
-export const promptOf = (w, modeId) => (direction(modeId) === "en2jp" ? w.english : w.japanese);   // what the student reads
-export const answerOf = (w, modeId) => (direction(modeId) === "en2jp" ? w.japanese : w.english);   // what the student picks
+export const promptOf = (w, modeId) => (isFill(modeId) ? w.fillBlankEN : direction(modeId) === "en2jp" ? w.english : w.japanese);   // what the student reads
+export const answerOf = (w, modeId) => (isFill(modeId) ? fillForm(w) : direction(modeId) === "en2jp" ? w.japanese : w.english);   // what the student picks
 const looseJa = s => normJa(s).replace(/\s+/g, "").replace(/[。．.]+$/, "");                          // "ありがとう。" == "ありがとう"
 function shuffleWith(a, rand) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 // The 4 choices for one question: the right answer + 3 wrong ones from the same pool. Returns [{ text, ok }] in random order.
 // A wrong choice never has the same English or Japanese as the target, and no two choices are the same text.
 // jp2en: random wrong choices (unchanged since Phase C). en2jp: wrong Japanese choices of similar length, so a short answer is not a giveaway.
 export function makeChoices(target, pool, modeId, rand = Math.random) {
+  if (isFill(modeId)) return fillChoices(target, pool, rand);
   const dir = direction(modeId), opts = [];
   if (dir === "jp2en") {
     const seen = new Set([normEn(target.english)]);
@@ -97,7 +138,34 @@ export function makeChoices(target, pool, modeId, rand = Math.random) {
   return shuffleWith([{ text: target.japanese, ok: true }, ...opts], rand);
 }
 
+// Fill in the Blank: the right answer form + 3 other answer forms, the same kind of word first (verb with verbs, noun with nouns).
+// A wrong choice is never the target's word, nor one of its accepted answers, and no two choices are the same.
+function fillChoices(target, pool, rand) {
+  const right = fillForm(target), used = new Set([normEn(right), normEn(target.english), ...(target.acceptedAnswers || []).map(normEn)]);
+  const same = [], other = [];
+  for (const w of shuffleWith(pool, rand)) {
+    if (sameEnglish(w, target)) continue;
+    (target.category && w.category === target.category ? same : other).push(fillForm(w));
+  }
+  const opts = [];
+  for (const f of [...same, ...other]) {
+    if (opts.length >= 3) break;
+    const k = normEn(f); if (!k || used.has(k)) continue;
+    used.add(k); opts.push({ text: f, ok: false });
+  }
+  // same capital-letter style as the right answer, so the first letter is never a giveaway
+  const starts = /^_{3,}/.test(String(target.fillBlankEN || "").trim());
+  const style = t => (starts ? t.charAt(0).toUpperCase() + t.slice(1) : t);
+  return shuffleWith([{ text: right, ok: true }, ...opts.map(o => ({ ...o, text: style(o.text) }))], rand);
+}
+
 /* ------------------------------------------------------------ pools */
+// The fields a race uses. (The fingerprint still uses only id / English / Japanese, as before.)
+function slim(w, n) {
+  const o = { id: w.id, english: w.english, japanese: w.japanese, unit: Number(n) };
+  if (w.fillBlankEN) { o.fillBlankEN = w.fillBlankEN; o.exampleEN = w.exampleEN || ""; o.exampleJP = w.exampleJP || ""; o.answer = fillForm(w); o.acceptedAnswers = Array.isArray(w.acceptedAnswers) ? w.acceptedAnswers.slice() : []; o.category = w.category || ""; }
+  return o;
+}
 export function gradeList(data) {
   return ["nh1", "nh2", "nh3"].map(id => ({ id, title: data[id].title, label: data[id].label }));
 }
@@ -115,7 +183,7 @@ export function buildPool(data, gradeId, unitNumbers, modeId) {
     for (const w of U.words) {
       if (!isUsable(w, modeId)) { unusable++; continue; }
       const k = dupKey(w); if (seen.has(k)) { duplicates++; continue; }
-      seen.add(k); out.push({ id: w.id, english: w.english, japanese: w.japanese, unit: Number(n) });
+      seen.add(k); out.push(slim(w, n));
     }
   }
   return { words: out, unusable, duplicates };
@@ -140,7 +208,7 @@ export async function fingerprint(words) {
 }
 export function wordIndex(data) {
   const m = new Map();
-  for (const g of ["nh1", "nh2", "nh3"]) for (const [n, U] of Object.entries(data[g].units)) for (const w of U.words) m.set(w.id, { id: w.id, english: w.english, japanese: w.japanese, unit: Number(n) });
+  for (const g of ["nh1", "nh2", "nh3"]) for (const [n, U] of Object.entries(data[g].units)) for (const w of U.words) m.set(w.id, slim(w, n));
   return m;
 }
 // Does MY copy of the vocabulary give exactly the host's 40 words? ("ok" | "missing" | "different")
