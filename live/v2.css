@@ -171,7 +171,6 @@ body.projector #q-type{display:none !important}
   #race:has(#live:not([hidden])) .qword{font-size:2.2rem;margin:6px 0 12px}
   #race:has(#live:not([hidden])) .choices{grid-template-columns:1fr 1fr;gap:10px}
   #race:has(#live:not([hidden])) .choices button{min-height:64px;text-align:center}
-  #live .label{position:sticky;top:-14px;background:#fff;padding:6px 0;margin:-6px 0 8px;z-index:1}
   #live .board li{padding:4px 6px}
   #live .board li.me{outline:3px solid var(--ink);background:var(--sun)}
 
@@ -194,3 +193,38 @@ body.projector #race{display:block !important}
 .qword.sentence::after{font-size:.7em;font-weight:600;margin-top:6px;opacity:.8}
 @media (max-width:480px){.qword.sentence{font-size:1.25rem}}
 body.projector .qword.sentence{font-size:2rem}
+
+/* ===== Live board polish (Remove button + scrollable player list) =====
+   Styles only: no JavaScript, Firebase, permissions or race logic change. */
+
+/* 1. Remove button: its own column on the right of the row, "Remove" with "はずす" underneath */
+#board li{grid-template-columns:2.2em minmax(0,1fr) auto;column-gap:8px;text-align:left}
+#board li:has(> .kick){grid-template-columns:2.2em minmax(0,1fr) auto auto}
+#board li > span:nth-child(2){min-width:0;overflow-wrap:anywhere}
+#board li > .bar{grid-column:2 / 4}
+#board li > .kick{
+  grid-column:4;grid-row:1 / span 2;align-self:center;
+  margin:0;min-width:5.6em;min-height:44px;padding:4px 12px;
+  white-space:nowrap;text-align:center;line-height:1.15;font-size:.9rem;
+}
+#board li > .kick::after{white-space:nowrap;font-size:.8em}
+
+/* 2. Player list scrolls inside the board; the heading stays at the top */
+#live{display:flex;flex-direction:column}
+#live > .label{flex:none;position:static;margin:0 0 8px;padding:0}
+#board{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:4px;max-height:55dvh}
+
+@media (min-width:760px){
+  /* the board owns the right column; everything below the question stays on the left, so the sticky board never covers it */
+  #race:has(#live:not([hidden])) > #live{
+    grid-row:3 / span 20;max-height:calc(100dvh - 110px);overflow:hidden;
+  }
+  #race:has(#live:not([hidden])) > #live ~ *{grid-column:1}
+  #race:has(#live:not([hidden])) > #live ~ .small,#race:has(#live:not([hidden])) > #live ~ .back{justify-self:center;min-width:220px}
+  #board{max-height:none}
+}
+
+/* projector: show the whole board, no inner scrolling */
+body.projector #live{display:block;max-height:none !important;overflow:visible !important}
+body.projector #board{max-height:none;overflow:visible}
+body.projector #board li > .kick{display:none}
